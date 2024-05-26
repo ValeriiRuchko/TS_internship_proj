@@ -1,0 +1,21 @@
+/* #root { */
+/*   max-width: 1280px; */
+/*   margin: 0 auto; */
+/*   padding: 2rem; */
+/*   text-align: center; */
+/* } */
+
+/* styles to fill out the page properly and main content too ----- */
+.App {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* I have to apply this style to every page in order for main content to fill out the whole page */
+.main_content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  padding: 3% 5%;
+}
