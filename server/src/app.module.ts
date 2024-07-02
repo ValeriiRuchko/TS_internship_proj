@@ -11,6 +11,7 @@ import { ImagesModule } from './images/images.module';
 import { CategoryGroupsModule } from './category_groups/category_groups.module';
 import { CategoriesModule } from './categories/categories.module';
 import { NotificationTimesModule } from './notification_times/notification_times.module';
+import { DbModule } from './db/db.module';
 
 // that's the place where we essentially describe what providers (services) a controller can have
 // helps with DI
@@ -26,8 +27,8 @@ import { NotificationTimesModule } from './notification_times/notification_times
       database: new ConfigService().get<string>('DB_NAME'),
       entities: ['dist/**/*.entity.js'],
       // need to set to FALSE synchronize in prod in order not to recreate schema every time
-      synchronize: false,
-      logging: true,
+      synchronize: true,
+      logging: false,
       autoLoadEntities: true,
     }),
     //------
@@ -38,6 +39,7 @@ import { NotificationTimesModule } from './notification_times/notification_times
     CategoryGroupsModule,
     CategoriesModule,
     NotificationTimesModule,
+    DbModule,
   ],
   controllers: [AppController],
   providers: [AppService],

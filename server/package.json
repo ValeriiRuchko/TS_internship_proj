@@ -17,7 +17,8 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "seed:run": "pnpm run build && typeorm-extension seed:run -d ./dist/db/data-source.js"
   },
   "dependencies": {
     "@nestjs/common": "^10.3.9",
@@ -26,10 +27,12 @@
     "@nestjs/mapped-types": "^2.0.5",
     "@nestjs/platform-express": "^10.3.9",
     "@nestjs/typeorm": "^10.0.2",
+    "dotenv": "^16.4.5",
     "pg": "^8.12.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
-    "typeorm": "^0.3.20"
+    "typeorm": "^0.3.20",
+    "typeorm-extension": "^3.5.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.3.2",

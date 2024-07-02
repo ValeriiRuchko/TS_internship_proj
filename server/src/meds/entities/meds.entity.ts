@@ -39,6 +39,6 @@ export class Med {
   images: Image[];
 
   @ManyToMany(() => Category, (category) => category.meds)
-  @JoinTable()
+  @JoinTable({ name: 'categories_to_meds' })
   categories: Category[];
 }
