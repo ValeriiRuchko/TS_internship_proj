@@ -5,7 +5,7 @@ import { config } from 'dotenv';
 
 config();
 
-export const dataSource: DataSourceOptions & SeederOptions = {
+export const dataSourceOpts: DataSourceOptions & SeederOptions = {
   type: 'postgres',
   host: process.env.DB_HOST,
   port: +process.env.DB_PORT!,

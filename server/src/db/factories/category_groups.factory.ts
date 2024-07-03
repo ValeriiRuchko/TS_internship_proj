@@ -4,6 +4,8 @@ import { CategoryGroup } from 'src/category_groups/entities/category_group.entit
 
 export const CategoryGroupFactory = setSeederFactory(CategoryGroup, (faker) => {
   const category_group = new CategoryGroup();
-  category_group.name = faker.lorem.word();
+
+  // return one random value from array
+  category_group.name = faker.word.noun();
   return category_group;
 });

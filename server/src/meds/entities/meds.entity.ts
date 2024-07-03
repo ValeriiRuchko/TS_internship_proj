@@ -10,6 +10,7 @@ import {
   ManyToOne,
   ManyToMany,
   JoinTable,
+  OneToOne,
 } from 'typeorm';
 
 @Entity({ name: 'meds' })
@@ -32,8 +33,8 @@ export class Med {
   @ManyToOne(() => User, (user) => user.meds)
   user: User;
 
-  @OneToMany(() => Notification, (notification) => notification.med)
-  notifications: Notification[];
+  @OneToOne(() => Notification, (notification) => notification.med)
+  notification: Notification;
 
   @OneToMany(() => Image, (image) => image.med)
   images: Image[];

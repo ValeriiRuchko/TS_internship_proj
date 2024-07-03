@@ -11,7 +11,7 @@ import { ImagesModule } from './images/images.module';
 import { CategoryGroupsModule } from './category_groups/category_groups.module';
 import { CategoriesModule } from './categories/categories.module';
 import { NotificationTimesModule } from './notification_times/notification_times.module';
-import { DbModule } from './db/db.module';
+// import { DbModule } from './db/db.module';
 
 // that's the place where we essentially describe what providers (services) a controller can have
 // helps with DI
@@ -39,7 +39,7 @@ import { DbModule } from './db/db.module';
     CategoryGroupsModule,
     CategoriesModule,
     NotificationTimesModule,
-    DbModule,
+    // DbModule,
   ],
   controllers: [AppController],
   providers: [AppService],

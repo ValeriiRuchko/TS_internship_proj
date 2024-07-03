@@ -4,8 +4,9 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
   OneToMany,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 
 @Entity({ name: 'notifications' })
@@ -28,7 +29,8 @@ export class Notification {
   @Column('text')
   notificationMsg: string;
 
-  @ManyToOne(() => Med, (med) => med.notifications)
+  @OneToOne(() => Med, (med) => med.notification)
+  @JoinColumn()
   med: Med;
 
   @OneToMany(
