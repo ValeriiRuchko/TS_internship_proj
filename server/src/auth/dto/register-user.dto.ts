@@ -1,7 +1,6 @@
-export class CreateUserDto {
+export class RegisterUserDto {
   name: string;
   surname: string;
   email: string;
-  salt: string;
   password: string;
 }
