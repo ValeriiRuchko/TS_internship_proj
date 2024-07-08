@@ -8,14 +8,27 @@ import {
 import { Observable } from 'rxjs';
 import { Request } from 'express';
 import { AuthService } from './auth.service';
+import { Reflector } from '@nestjs/core';
+import { SKIP_AUTH_KEY } from './auth.decorator';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private reflector: Reflector,
+  ) {}
 
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
+    const skipAuth = this.reflector.getAllAndOverride<boolean>(SKIP_AUTH_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
+    if (skipAuth) {
+      return true;
+    }
+
     const request = context.switchToHttp().getRequest();
     const token = this.extractTokenFromHeader(request);
     if (!token) {
