@@ -4,4 +4,5 @@ export class CreateUserDto {
   email: string;
   salt: string;
   password: string;
+  isPremium?: boolean;
 }

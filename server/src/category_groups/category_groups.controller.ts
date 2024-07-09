@@ -1,9 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { CategoryGroupsService } from './category_groups.service';
 import { CreateCategoryGroupDto } from './dto/create-category_group.dto';
 import { UpdateCategoryGroupDto } from './dto/update-category_group.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('category-groups')
+@UseGuards(AuthGuard('jwt'))
 export class CategoryGroupsController {
   constructor(private readonly categoryGroupsService: CategoryGroupsService) {}
 
@@ -23,7 +34,10 @@ export class CategoryGroupsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCategoryGroupDto: UpdateCategoryGroupDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateCategoryGroupDto: UpdateCategoryGroupDto,
+  ) {
     return this.categoryGroupsService.update(+id, updateCategoryGroupDto);
   }
 

@@ -79,9 +79,3 @@ export class AuthService {
     }
   }
 }
-
-// const user = await this.findOneByEmail(createUserDto.email);
-// checking if user with the same email doesn'y already exist
-// if (user) {
-// throw new HttpException('User already exists', HttpStatus.CONFLICT);
-// }

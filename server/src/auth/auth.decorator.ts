@@ -1,4 +1,6 @@
 import { SetMetadata } from '@nestjs/common';
 
-export const SKIP_AUTH_KEY = 'skipAuth';
-export const SkipAuth = () => SetMetadata(SKIP_AUTH_KEY, true);
+import { Role } from './enums/role.enum';
+
+export const ROLES_KEY = 'roles';
+export const Roles = (role: Role) => SetMetadata(ROLES_KEY, role);

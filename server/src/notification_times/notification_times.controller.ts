@@ -1,11 +1,24 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
 import { NotificationTimesService } from './notification_times.service';
 import { CreateNotificationTimeDto } from './dto/create-notification_time.dto';
 import { UpdateNotificationTimeDto } from './dto/update-notification_time.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('notification-times')
+@UseGuards(AuthGuard('jwt'))
 export class NotificationTimesController {
-  constructor(private readonly notificationTimesService: NotificationTimesService) {}
+  constructor(
+    private readonly notificationTimesService: NotificationTimesService,
+  ) {}
 
   @Post()
   create(@Body() createNotificationTimeDto: CreateNotificationTimeDto) {
@@ -23,7 +36,10 @@ export class NotificationTimesController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateNotificationTimeDto: UpdateNotificationTimeDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateNotificationTimeDto: UpdateNotificationTimeDto,
+  ) {
     return this.notificationTimesService.update(+id, updateNotificationTimeDto);
   }
 
