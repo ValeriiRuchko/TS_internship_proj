@@ -1,26 +1,71 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateCategoryGroupDto } from './dto/create-category_group.dto';
 import { UpdateCategoryGroupDto } from './dto/update-category_group.dto';
+import { CategoryGroup } from './entities/category_group.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class CategoryGroupsService {
-  create(createCategoryGroupDto: CreateCategoryGroupDto) {
-    return 'This action adds a new categoryGroup';
+  constructor(
+    @InjectRepository(CategoryGroup)
+    private categoryGroupsRepository: Repository<CategoryGroup>,
+  ) {}
+
+  async create(
+    createCategoryGroupDto: CreateCategoryGroupDto,
+    user_id: string,
+  ): Promise<void> {
+    const categoryGroup = await this.categoryGroupsRepository.save({
+      name: createCategoryGroupDto.name,
+      user: {
+        id: user_id,
+      },
+    });
+    console.log('Category group is created', categoryGroup);
   }
 
-  findAll() {
-    return `This action returns all categoryGroups`;
+  async findAll(user_id: string): Promise<CategoryGroup[]> {
+    // all category_groups related to user
+    const categoryGroups = await this.categoryGroupsRepository.find({
+      where: {
+        user: {
+          id: user_id,
+        },
+      },
+    });
+
+    return categoryGroups;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} categoryGroup`;
+  async findOne(id: string): Promise<CategoryGroup> {
+    const categoryGroup = await this.categoryGroupsRepository.findOneBy({
+      id,
+    });
+    if (!categoryGroup) {
+      throw new HttpException('Category group not found', HttpStatus.NOT_FOUND);
+    }
+    return categoryGroup;
   }
 
-  update(id: number, updateCategoryGroupDto: UpdateCategoryGroupDto) {
-    return `This action updates a #${id} categoryGroup`;
+  async update(
+    id: string,
+    updateCategoryGroupDto: UpdateCategoryGroupDto,
+  ): Promise<void> {
+    const categoryGroup = await this.categoryGroupsRepository.findOneBy({ id });
+    if (!categoryGroup) {
+      throw new HttpException('Category group not found', HttpStatus.NOT_FOUND);
+    }
+    await this.categoryGroupsRepository.update({ id }, updateCategoryGroupDto);
+    console.log('Category_group update');
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} categoryGroup`;
+  async remove(id: string): Promise<void> {
+    const categoryGroup = await this.categoryGroupsRepository.findOneBy({ id });
+    if (!categoryGroup) {
+      throw new HttpException('Category group not found', HttpStatus.NOT_FOUND);
+    }
+    await this.categoryGroupsRepository.delete({ id });
+    console.log('Category_group deleted');
   }
 }

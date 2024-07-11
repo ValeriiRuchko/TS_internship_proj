@@ -33,10 +33,12 @@ export class Med {
   @ManyToOne(() => User, (user) => user.meds)
   user: User;
 
-  @OneToOne(() => Notification, (notification) => notification.med)
+  @OneToOne(() => Notification, (notification) => notification.med, {
+    onDelete: 'CASCADE',
+  })
   notification: Notification;
 
-  @OneToMany(() => Image, (image) => image.med)
+  @OneToMany(() => Image, (image) => image.med, { onDelete: 'CASCADE' })
   images: Image[];
 
   @ManyToMany(() => Category, (category) => category.meds)

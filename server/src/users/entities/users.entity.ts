@@ -1,3 +1,4 @@
+import { CategoryGroup } from 'src/category_groups/entities/category_group.entity';
 import { Image } from 'src/images/entities/image.entity';
 import { Med } from 'src/meds/entities/meds.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
@@ -27,9 +28,16 @@ export class User {
   @Column({ default: false })
   isPremium: boolean;
 
-  @OneToMany(() => Med, (medication) => medication.user)
+  @OneToMany(() => Med, (medication) => medication.user, {
+    onDelete: 'CASCADE',
+  })
   meds: Med[];
 
-  @OneToMany(() => Image, (img) => img.user)
+  @OneToMany(() => Image, (img) => img.user, { onDelete: 'CASCADE' })
   images: Image[];
+
+  @OneToMany(() => CategoryGroup, (category_group) => category_group.user, {
+    onDelete: 'CASCADE',
+  })
+  categoryGroups: CategoryGroup[];
 }

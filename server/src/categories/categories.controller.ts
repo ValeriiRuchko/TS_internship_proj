@@ -27,8 +27,8 @@ export class CategoriesController {
   }
 
   @Get()
-  findAll() {
-    return this.categoriesService.findAll();
+  findAll(@Body() categories: string[]) {
+    return this.categoriesService.findAll(categories);
   }
 
   @Get(':id')

@@ -36,6 +36,7 @@ export class Notification {
   @OneToMany(
     () => NotificationTime,
     (notificationTime) => notificationTime.notification,
+    { onDelete: 'CASCADE' },
   )
   notificationTimes: NotificationTime[];
 }

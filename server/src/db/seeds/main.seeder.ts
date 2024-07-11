@@ -44,6 +44,8 @@ export default class MainSeeder implements Seeder {
     const imagesFactory = factoryManager.get(Image);
     const notificationsFactory = factoryManager.get(Notification);
     const notificationTimesFactory = factoryManager.get(NotificationTime);
+    ///
+    const user = await usersFactory.save();
 
     // 2 - Generating our most distant in scheme-graph entities + their relations:
     //
@@ -52,6 +54,7 @@ export default class MainSeeder implements Seeder {
       category_groups_mock.map(async (elem) => {
         const made = await categoryGroupsFactory.make({
           name: elem,
+          user: user,
         });
         return made;
       }),
@@ -83,8 +86,7 @@ export default class MainSeeder implements Seeder {
     );
     await notificationTimesRepository.save(notificationTimes);
 
-    // USERS + MEDS
-    const user = await usersFactory.save();
+    //MEDS
     const meds = await Promise.all(
       notifications.map(async (elem) => {
         const made = await medsFactory.make({

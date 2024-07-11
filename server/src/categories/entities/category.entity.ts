@@ -16,7 +16,9 @@ export class Category {
   @Column('text')
   name: string;
 
-  @ManyToOne(() => CategoryGroup, (categoryGroup) => categoryGroup.categories)
+  @ManyToOne(() => CategoryGroup, (categoryGroup) => categoryGroup.categories, {
+    onDelete: 'CASCADE',
+  })
   categoryGroup: CategoryGroup;
 
   @ManyToMany(() => Med, (med) => med.categories)
