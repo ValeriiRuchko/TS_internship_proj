@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,13 +7,15 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class UsersService {
+  private readonly logger = new Logger(UsersService.name);
+
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
     const res = await this.usersRepository.save(createUserDto);
-    console.log('User was created', res.email);
+    this.logger.debug('User was created', JSON.stringify(res));
   }
 
   async findAll(): Promise<User[]> {
@@ -45,7 +47,7 @@ export class UsersService {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
     await this.usersRepository.update({ id }, updateUserDto);
-    console.log('User updated');
+    this.logger.debug('User updated', JSON.stringify(user));
   }
 
   async remove(id: string): Promise<void> {
@@ -54,6 +56,6 @@ export class UsersService {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
     await this.usersRepository.delete({ id });
-    console.log('User deleted');
+    this.logger.debug('User deleted', JSON.stringify(user));
   }
 }

@@ -7,11 +7,14 @@ import {
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { CategoryGroup } from 'src/category_groups/entities/category_group.entity';
+import { ReqWithToken } from 'src/types_&_interfaces/request.interface';
 // import { Roles } from 'src/auth/auth.decorator';
 // import { Role } from 'src/auth/enums/role.enum';
 
@@ -27,13 +30,13 @@ export class CategoriesController {
   }
 
   @Get()
-  findAll(@Body() categories: string[]) {
-    return this.categoriesService.findAll(categories);
+  findAll(@Body() categoryGroup: CategoryGroup, @Req() req: ReqWithToken) {
+    return this.categoriesService.findAll(categoryGroup, req.user.sub);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.categoriesService.findOne(+id);
+    return this.categoriesService.findOne(id);
   }
 
   @Patch(':id')
@@ -41,11 +44,11 @@ export class CategoriesController {
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
   ) {
-    return this.categoriesService.update(+id, updateCategoryDto);
+    return this.categoriesService.update(id, updateCategoryDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.categoriesService.remove(+id);
+    return this.categoriesService.remove(id);
   }
 }

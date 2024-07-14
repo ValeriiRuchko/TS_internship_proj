@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { CreateCategoryGroupDto } from './dto/create-category_group.dto';
 import { UpdateCategoryGroupDto } from './dto/update-category_group.dto';
 import { CategoryGroup } from './entities/category_group.entity';
@@ -7,6 +7,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class CategoryGroupsService {
+  private readonly logger = new Logger(CategoryGroupsService.name);
+
   constructor(
     @InjectRepository(CategoryGroup)
     private categoryGroupsRepository: Repository<CategoryGroup>,
@@ -22,7 +24,10 @@ export class CategoryGroupsService {
         id: user_id,
       },
     });
-    console.log('Category group is created', categoryGroup);
+    this.logger.debug(
+      'Category group is created',
+      JSON.stringify(categoryGroup),
+    );
   }
 
   async findAll(user_id: string): Promise<CategoryGroup[]> {
@@ -52,20 +57,17 @@ export class CategoryGroupsService {
     id: string,
     updateCategoryGroupDto: UpdateCategoryGroupDto,
   ): Promise<void> {
-    const categoryGroup = await this.categoryGroupsRepository.findOneBy({ id });
-    if (!categoryGroup) {
-      throw new HttpException('Category group not found', HttpStatus.NOT_FOUND);
-    }
-    await this.categoryGroupsRepository.update({ id }, updateCategoryGroupDto);
-    console.log('Category_group update');
+    const categoryGroup = await this.findOne(id);
+    await this.categoryGroupsRepository.update(
+      { id: categoryGroup.id },
+      updateCategoryGroupDto,
+    );
+    this.logger.debug('Category_group update', JSON.stringify(CategoryGroup));
   }
 
   async remove(id: string): Promise<void> {
-    const categoryGroup = await this.categoryGroupsRepository.findOneBy({ id });
-    if (!categoryGroup) {
-      throw new HttpException('Category group not found', HttpStatus.NOT_FOUND);
-    }
-    await this.categoryGroupsRepository.delete({ id });
-    console.log('Category_group deleted');
+    const categoryGroup = await this.findOne(id);
+    await this.categoryGroupsRepository.delete({ id: categoryGroup.id });
+    this.logger.debug('Category_group deleted', JSON.stringify(CategoryGroup));
   }
 }

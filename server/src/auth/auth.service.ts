@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/users/users.service';
 import { RegisterUserDto } from './dto/register-user.dto';
@@ -8,6 +8,8 @@ import { User } from 'src/users/entities/users.entity';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
+
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService,
@@ -20,7 +22,7 @@ export class AuthService {
         registerUserDto.email,
       );
     } catch (err) {
-      console.log("User by email hasn't been found");
+      this.logger.debug("User by email hasn't been found");
     }
 
     if (existingUser) {

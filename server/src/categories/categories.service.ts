@@ -1,13 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
-import { FindOptionsWhere, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryGroupsService } from 'src/category_groups/category_groups.service';
+import { CategoryGroup } from 'src/category_groups/entities/category_group.entity';
 
 @Injectable()
 export class CategoriesService {
+  private readonly logger = new Logger(CategoriesService.name);
+
   constructor(
     @InjectRepository(Category)
     private categoriesRepository: Repository<Category>,
@@ -17,39 +20,58 @@ export class CategoriesService {
 
   async create(createCategoryDto: CreateCategoryDto): Promise<void> {
     const categoryGroup = await this.categoryGroupsService.findOne(
-      createCategoryDto.categoryGroup,
+      createCategoryDto.categoryGroup.id,
     );
     const res = await this.categoriesRepository.save({
       ...createCategoryDto,
       categoryGroup,
     });
-    console.log('Category was created', res);
+    this.logger.debug('Category was created', JSON.stringify(res));
   }
 
-  async findAll(category_names: string[]): Promise<Category[]> {
-    // TODO: rewrite to use ID's, not names
-    const categoryFindOptions: FindOptionsWhere<Category>[] = [];
-
-    category_names.forEach((elem) => {
-      categoryFindOptions.push({ name: elem });
-    });
-
+  async findAll(
+    categoryGroup: CategoryGroup,
+    user_id: string,
+  ): Promise<Category[]> {
     const categories = await this.categoriesRepository.find({
-      where: [...categoryFindOptions],
+      where: {
+        categoryGroup: {
+          id: categoryGroup.id,
+          user: {
+            id: user_id,
+          },
+        },
+      },
     });
 
     return categories;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} category`;
+  async findOne(id: string): Promise<Category> {
+    const category = await this.categoriesRepository.findOneBy({
+      id,
+    });
+    if (!category) {
+      throw new HttpException('Category not found', HttpStatus.NOT_FOUND);
+    }
+    return category;
   }
 
-  update(id: number, updateCategoryDto: UpdateCategoryDto) {
-    return `This action updates a #${id} category ${updateCategoryDto}`;
+  async update(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+  ): Promise<void> {
+    const category = await this.findOne(id);
+    await this.categoriesRepository.update(
+      { id: category.id },
+      updateCategoryDto,
+    );
+    this.logger.debug('Category was updated', JSON.stringify(category));
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} category`;
+  async remove(id: string): Promise<void> {
+    const category = await this.findOne(id);
+    await this.categoriesRepository.delete({ id: category.id });
+    this.logger.debug('Category was deleted', JSON.stringify(category));
   }
 }

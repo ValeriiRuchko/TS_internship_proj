@@ -3,15 +3,16 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { ImagesService } from './images.service';
 import { CreateImageDto } from './dto/create-image.dto';
-import { UpdateImageDto } from './dto/update-image.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { FilteredImageDto } from './dto/find-filtered.dto';
+import { ReqWithToken } from 'src/types_&_interfaces/request.interface';
 
 @Controller('images')
 @UseGuards(AuthGuard('jwt'))
@@ -24,22 +25,22 @@ export class ImagesController {
   }
 
   @Get()
-  findAll() {
-    return this.imagesService.findAll();
+  findAllForMed(@Body() filteredImageDto: FilteredImageDto) {
+    return this.imagesService.findAllForMed(filteredImageDto);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.imagesService.findOne(+id);
+    return this.imagesService.findOne(id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateImageDto: UpdateImageDto) {
-    return this.imagesService.update(+id, updateImageDto);
+  @Get('profile-img')
+  findOneByUser(@Req() req: ReqWithToken) {
+    return this.imagesService.findOneByUser(req.user.sub);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.imagesService.remove(+id);
+    return this.imagesService.remove(id);
   }
 }

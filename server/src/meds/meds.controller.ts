@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   Req,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { MedsService } from './meds.service';
 import { CreateMedDto } from './dto/create-med.dto';
@@ -15,6 +17,7 @@ import { UpdateMedDto } from './dto/update-med.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { FilteredMedDto } from './dto/find-filtered.dto';
 import { ReqWithToken } from 'src/types_&_interfaces/request.interface';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('meds')
 @UseGuards(AuthGuard('jwt'))
@@ -22,8 +25,15 @@ export class MedsController {
   constructor(private readonly medsService: MedsService) {}
 
   @Post()
-  create(@Body() createMedDto: CreateMedDto, @Req() req: ReqWithToken) {
-    return this.medsService.create(createMedDto, req.user.sub);
+  @UseInterceptors(FilesInterceptor('files'))
+  create(
+    @UploadedFiles() files: Array<Express.Multer.File>,
+    @Body() createMedDto: CreateMedDto,
+    @Req() req: ReqWithToken,
+  ) {
+    console.log(files);
+    console.log(createMedDto);
+    return this.medsService.create(createMedDto, req.user.sub, files);
   }
 
   @Get()

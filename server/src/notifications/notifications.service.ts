@@ -12,9 +12,7 @@ export class NotificationsService {
     private notificationsRepository: Repository<Notification>,
   ) {}
 
-  create(createNotificationDto: CreateNotificationDto) {
-    return 'This action adds a new notification';
-  }
+  async create(createNotificationDto: CreateNotificationDto): Promise<void> {}
 
   findAll(): Promise<Notification[]> {
     return this.notificationsRepository.find();
