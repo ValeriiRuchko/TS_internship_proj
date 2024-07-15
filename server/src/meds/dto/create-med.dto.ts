@@ -1,4 +1,5 @@
-import { IsDate, IsNotEmpty, IsNumber } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsDate, IsInt, IsNotEmpty } from 'class-validator';
 import { Category } from 'src/categories/entities/category.entity';
 import { Notification } from 'src/notifications/entities/notifications.entity';
 
@@ -11,10 +12,12 @@ export class CreateMedDto {
   description: string;
 
   @IsNotEmpty()
-  @IsNumber()
+  @Type(() => Number)
+  @IsInt()
   pillsAmount: number;
 
   @IsNotEmpty()
+  @Type(() => Date)
   @IsDate()
   expirationDate: Date;
 

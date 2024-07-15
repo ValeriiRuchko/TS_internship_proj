@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Image } from './entities/image.entity';
 import { Repository } from 'typeorm';
 import { FilteredImageDto } from './dto/find-filtered.dto';
+import { unlink } from 'fs/promises';
 
 @Injectable()
 export class ImagesService {
@@ -49,9 +50,16 @@ export class ImagesService {
     return image;
   }
 
-  // TODO: add operation of also removing image from the folder
   async remove(id: string): Promise<void> {
     const image = await this.findOne(id);
+    this.logger.debug('Current dir', process.cwd());
+    const pathToFile = process.cwd() + `/${image.pathToImage}`;
+    try {
+      await unlink(pathToFile);
+      console.log('Successfully deleted:', pathToFile);
+    } catch (error) {
+      console.error('There was an error:', error.message);
+    }
     await this.imagesRepository.delete({ id: image.id });
     this.logger.debug('Image was deleted', JSON.stringify(image));
   }

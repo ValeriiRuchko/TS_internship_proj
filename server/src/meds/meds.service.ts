@@ -8,6 +8,7 @@ import { Med } from './entities/meds.entity';
 import { ImagesService } from 'src/images/images.service';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { Repository } from 'typeorm';
+import { Category } from 'src/categories/entities/category.entity';
 
 @Injectable()
 export class MedsService {
@@ -25,16 +26,23 @@ export class MedsService {
     user_id: string,
     files: Array<Express.Multer.File>,
   ) {
+    this.logger.debug('CreateMedDto: ', JSON.stringify(createMedDto));
+
     // saving med with related categories, also assigning the user and filling other options
     const med = await this.medsRepository.save({
-      createMedDto,
+      ...createMedDto,
       user: { id: user_id },
     });
 
-    // creating new notifications and relationg them to the created med
-    createMedDto.notifications.forEach(async (elem) => {
-      await this.notificationsService.create({ ...elem, med });
-    });
+    // TODO: add notifications appropriately
+    // TODO: add categories appropriately
+    if (createMedDto.notifications) {
+      // creating new notifications and relationg them to the created med
+      createMedDto.notifications.forEach(async (elem) => {
+        this.logger.warn('AAAAA');
+        await this.notificationsService.create({ ...elem, med });
+      });
+    }
 
     // creating image files and relating them to the created med
     files.forEach(async (elem) => {
@@ -53,14 +61,20 @@ export class MedsService {
       ],
       relations: {
         categories: true,
-        user: true,
+        images: true,
       },
     });
     return meds;
   }
 
   async findOne(id: string): Promise<Med> {
-    const res = await this.medsRepository.findOneBy({ id });
+    const res = await this.medsRepository.findOne({
+      where: { id },
+      relations: {
+        categories: true,
+        images: true,
+      },
+    });
     if (!res) {
       throw new HttpException('Med not found', HttpStatus.NOT_FOUND);
     }

@@ -16,15 +16,27 @@ import { CategoriesModule } from 'src/categories/categories.module';
     TypeOrmModule.forFeature([Med]),
     MulterModule.register({
       dest: './upload',
+      fileFilter(req, file, cb) {
+        const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpeg'];
+        if (!allowedMimeTypes.includes(file.mimetype)) {
+          cb(
+            new Error(
+              'File type is not appropriate, must be image/png, image/jpg, image/jpeg ',
+            ),
+            false,
+          );
+        }
+        cb(null, true);
+      },
       storage: multer.diskStorage({
         destination: './upload',
         filename: function (req, file, cb) {
           const ext = path.extname(file.originalname);
-          console.log('Extension', ext);
+          // console.log('Extension', ext);
           const originalName = path.basename(file.originalname, ext);
-          console.log('Original name', originalName);
+          // console.log('Original name', originalName);
           const newName = Date.now() + '-' + originalName + ext;
-          console.log('New name', newName);
+          // console.log('New name', newName);
           cb(null, newName);
         },
       }),
