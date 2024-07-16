@@ -8,7 +8,6 @@ import { Med } from './entities/meds.entity';
 import { ImagesService } from 'src/images/images.service';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { Repository } from 'typeorm';
-import { Category } from 'src/categories/entities/category.entity';
 
 @Injectable()
 export class MedsService {
@@ -21,16 +20,35 @@ export class MedsService {
     private categoriesService: CategoriesService,
   ) {}
 
-  async create(
-    createMedDto: CreateMedDto,
-    user_id: string,
+  async createImagesForMed(
     files: Array<Express.Multer.File>,
-  ) {
-    this.logger.debug('CreateMedDto: ', JSON.stringify(createMedDto));
+    med_id: string,
+  ): Promise<void> {
+    this.logger.warn(med_id);
+    const med = await this.findOne(med_id);
+
+    this.logger.debug('Files added to med', files);
+
+    // creating image files and relating them to the created med
+    files.forEach(async (elem) => {
+      await this.imagesService.create({
+        med,
+        pathToImage: elem.path,
+      });
+    });
+
+    this.logger.debug('Images for med were created', med);
+  }
+
+  // WARN: creation of med without images, so after calling this service you need to call the one above
+  // with proper med_id
+  async create(createMedDto: CreateMedDto, user_id: string): Promise<Med> {
+    this.logger.debug('CreateMedDto: ', createMedDto);
 
     // saving med with related categories, also assigning the user and filling other options
     const med = await this.medsRepository.save({
       ...createMedDto,
+      categories: createMedDto.categories,
       user: { id: user_id },
     });
 
@@ -43,12 +61,9 @@ export class MedsService {
         await this.notificationsService.create({ ...elem, med });
       });
     }
+    this.logger.debug('Med was created', med);
 
-    // creating image files and relating them to the created med
-    files.forEach(async (elem) => {
-      await this.imagesService.create({ med, pathToImage: elem.path });
-    });
-    this.logger.debug('Med was created', JSON.stringify(med));
+    return med;
   }
 
   async findAllByFilters(filteredMedDto: FilteredMedDto): Promise<Med[]> {
@@ -93,7 +108,7 @@ export class MedsService {
         ...updateMedDto,
       },
     );
-    this.logger.debug('Med updated', JSON.stringify(med));
+    this.logger.debug('Med updated', med);
   }
 
   async remove(id: string) {
@@ -102,6 +117,6 @@ export class MedsService {
       throw new HttpException('Med not found', HttpStatus.NOT_FOUND);
     }
     await this.medsRepository.delete({ id });
-    this.logger.debug('Med deleted', JSON.stringify(med));
+    this.logger.debug('Med deleted', med);
   }
 }

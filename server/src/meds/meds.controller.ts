@@ -28,22 +28,26 @@ import { FileRejectedErrorFilter } from './helpers/meds.filter';
 export class MedsController {
   constructor(private readonly medsService: MedsService) {}
 
-  @Post()
+  @Post(':id/images')
   @UseInterceptors(FilesInterceptor('files'))
   @UseFilters(FileRejectedErrorFilter)
-  create(
+  createImagesForMed(
     @UploadedFiles(
       new ParseFilePipe({
         validators: [new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' })],
+        fileIsRequired: false,
       }),
     )
     files: Array<Express.Multer.File>,
-    @Body() createMedDto: CreateMedDto,
-    @Req() req: ReqWithToken,
+    @Param('id')
+    id: string,
   ) {
-    console.log(files);
-    console.log('Hi from controller', createMedDto);
-    return this.medsService.create(createMedDto, req.user.sub, files);
+    return this.medsService.createImagesForMed(files, id);
+  }
+
+  @Post()
+  create(@Body() createMedDto: CreateMedDto, @Req() req: ReqWithToken) {
+    return this.medsService.create(createMedDto, req.user.sub);
   }
 
   @Get()

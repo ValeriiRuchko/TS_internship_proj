@@ -32,7 +32,7 @@ export class NotificationTimesController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.notificationTimesService.findOne(+id);
+    return this.notificationTimesService.findOne(id);
   }
 
   @Patch(':id')
@@ -40,11 +40,11 @@ export class NotificationTimesController {
     @Param('id') id: string,
     @Body() updateNotificationTimeDto: UpdateNotificationTimeDto,
   ) {
-    return this.notificationTimesService.update(+id, updateNotificationTimeDto);
+    return this.notificationTimesService.update(id, updateNotificationTimeDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.notificationTimesService.remove(+id);
+    return this.notificationTimesService.remove(id);
   }
 }

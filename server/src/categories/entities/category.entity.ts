@@ -17,6 +17,7 @@ export class Category {
   name: string;
 
   @ManyToOne(() => CategoryGroup, (categoryGroup) => categoryGroup.categories, {
+    cascade: true,
     onDelete: 'CASCADE',
   })
   categoryGroup: CategoryGroup;

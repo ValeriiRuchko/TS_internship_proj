@@ -25,8 +25,9 @@ import { CategoriesModule } from 'src/categories/categories.module';
             ),
             false,
           );
+        } else {
+          cb(null, true);
         }
-        cb(null, true);
       },
       storage: multer.diskStorage({
         destination: './upload',

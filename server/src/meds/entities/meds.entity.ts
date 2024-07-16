@@ -34,6 +34,7 @@ export class Med {
   user: User;
 
   @OneToOne(() => Notification, (notification) => notification.med, {
+    cascade: true,
     onDelete: 'CASCADE',
   })
   notification: Notification;
@@ -41,7 +42,7 @@ export class Med {
   @OneToMany(() => Image, (image) => image.med, { onDelete: 'CASCADE' })
   images: Image[];
 
-  @ManyToMany(() => Category, (category) => category.meds)
+  @ManyToMany(() => Category, (category) => category.meds, { cascade: true })
   @JoinTable({ name: 'categories_to_meds' })
   categories: Category[];
 }

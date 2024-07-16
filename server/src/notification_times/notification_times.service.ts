@@ -1,26 +1,53 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { CreateNotificationTimeDto } from './dto/create-notification_time.dto';
 import { UpdateNotificationTimeDto } from './dto/update-notification_time.dto';
+import { NotificationTime } from './entities/notification_time.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class NotificationTimesService {
-  create(createNotificationTimeDto: CreateNotificationTimeDto) {
-    return 'This action adds a new notificationTime';
+  private readonly logger = new Logger(NotificationTimesService.name);
+
+  constructor(
+    @InjectRepository(NotificationTime)
+    private notificationTimesRepository: Repository<NotificationTime>,
+  ) {}
+
+  async create(
+    createNotificationTimeDto: CreateNotificationTimeDto,
+  ): Promise<void> {
+    const notificationTime = await this.notificationTimesRepository.save(
+      createNotificationTimeDto,
+    );
+    this.logger.debug(
+      'Notification times was created for notification',
+      notificationTime,
+    );
   }
 
-  findAll() {
-    return `This action returns all notificationTimes`;
+  // TODO: change return type in Promise to NotificationTime[]
+  async findAll(): Promise<void> {
+    // return `This action returns all notificationTimes`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} notificationTime`;
+  async findOne(id: string): Promise<NotificationTime> {
+    const notificationTime = await this.notificationTimesRepository.findOneBy({
+      id,
+    });
+    if (!notificationTime) {
+      throw new HttpException(
+        'Notification time not found',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return notificationTime;
   }
 
-  update(id: number, updateNotificationTimeDto: UpdateNotificationTimeDto) {
-    return `This action updates a #${id} notificationTime`;
-  }
+  async update(
+    id: string,
+    updateNotificationTimeDto: UpdateNotificationTimeDto,
+  ): Promise<void> {}
 
-  remove(id: number) {
-    return `This action removes a #${id} notificationTime`;
-  }
+  async remove(id: string): Promise<void> {}
 }
