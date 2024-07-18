@@ -5,6 +5,7 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { genSalt, hash } from 'bcrypt';
 import { LoginUserDto } from './dto/login.dto';
 import { User } from 'src/users/entities/users.entity';
+import { ReqWithToken } from 'src/types_&_interfaces/request.interface';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +14,7 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService,
-  ) {}
+  ) { }
 
   async signUp(registerUserDto: RegisterUserDto) {
     let existingUser: User | undefined;
@@ -79,5 +80,20 @@ export class AuthService {
     } catch (err) {
       throw new HttpException('Invalid JWT token', HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async simulatePremium(sub: string): Promise<{ access_token: string }> {
+    // updating user's premium status to true, also will throw an err if smth goes wrong, so good
+    await this.usersService.update(sub, { isPremium: true });
+    // here we get user AFTER update so that DB was the only source of truth
+    const user = await this.usersService.findOneById(sub);
+
+    const payload = { sub: user.id, isPremium: user.isPremium };
+
+    this.logger.debug("User's updated payload got from db", payload);
+
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
   }
 }

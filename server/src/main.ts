@@ -10,7 +10,7 @@ async function bootstrap() {
   // need to do smth with cors later on
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     cors: false,
-    logger: ['log', 'warn', 'error', 'fatal', 'debug'],
+    logger: ['warn', 'error', 'fatal', 'debug'],
   });
 
   app.useStaticAssets(join(process.cwd(), '/upload'), { prefix: '/upload' });

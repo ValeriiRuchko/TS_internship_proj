@@ -15,7 +15,7 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto) {
     const res = await this.usersRepository.save(createUserDto);
-    this.logger.debug('User was created', JSON.stringify(res));
+    this.logger.debug('User was created', res);
   }
 
   async findAll(): Promise<User[]> {
@@ -47,7 +47,7 @@ export class UsersService {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
     await this.usersRepository.update({ id }, updateUserDto);
-    this.logger.debug('User updated', JSON.stringify(user));
+    this.logger.debug('User updated', user);
   }
 
   async remove(id: string): Promise<void> {
@@ -56,6 +56,6 @@ export class UsersService {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
     }
     await this.usersRepository.delete({ id });
-    this.logger.debug('User deleted', JSON.stringify(user));
+    this.logger.debug('User deleted', user);
   }
 }

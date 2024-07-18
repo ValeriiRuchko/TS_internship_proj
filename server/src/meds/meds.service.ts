@@ -30,12 +30,12 @@ export class MedsService {
     this.logger.debug('Files added to med', files);
 
     // creating image files and relating them to the created med
-    files.forEach(async (elem) => {
+    for (let i = 0; i <= files.length - 1; i++) {
       await this.imagesService.create({
         med,
-        pathToImage: elem.path,
+        pathToImage: files[i].path,
       });
-    });
+    }
 
     this.logger.debug('Images for med were created', med);
   }
@@ -43,39 +43,41 @@ export class MedsService {
   // WARN: creation of med without images, so after calling this service you need to call the one above
   // with proper med_id
   async create(createMedDto: CreateMedDto, user_id: string): Promise<Med> {
-    this.logger.debug('CreateMedDto: ', createMedDto);
-
     // saving med with related categories, also assigning the user and filling other options
     const med = await this.medsRepository.save({
       ...createMedDto,
-      categories: createMedDto.categories,
       user: { id: user_id },
     });
 
     // TODO: add notifications appropriately
-    // TODO: add categories appropriately
     if (createMedDto.notifications) {
-      // creating new notifications and relationg them to the created med
-      createMedDto.notifications.forEach(async (elem) => {
+      // creating new notifications and relating them to the created med
+      for (let i = 0; i <= createMedDto.notifications.length - 1; i++) {
         this.logger.warn('AAAAA');
-        await this.notificationsService.create({ ...elem, med });
-      });
+        // await this.notificationsService.create({ noti createMedDto.notifications[i], med });
+      }
     }
     this.logger.debug('Med was created', med);
 
     return med;
   }
 
-  async findAllByFilters(filteredMedDto: FilteredMedDto): Promise<Med[]> {
+  // currently it works like with OR - some category or some other category
+  async findAllByFilters(
+    filteredMedDto: FilteredMedDto,
+    user_id: string,
+  ): Promise<Med[]> {
     // actual query
     const meds = await this.medsRepository.find({
-      where: [
-        {
-          categories: filteredMedDto.categories,
+      where: {
+        user: {
+          id: user_id,
         },
-      ],
+        categories: filteredMedDto.categories,
+      },
       relations: {
         categories: true,
+        notification: true,
         images: true,
       },
     });
@@ -112,11 +114,8 @@ export class MedsService {
   }
 
   async remove(id: string) {
-    const med = await this.medsRepository.findOneBy({ id });
-    if (!med) {
-      throw new HttpException('Med not found', HttpStatus.NOT_FOUND);
-    }
-    await this.medsRepository.delete({ id });
+    const med = await this.findOne(id);
+    await this.medsRepository.delete({ id: med.id });
     this.logger.debug('Med deleted', med);
   }
 }

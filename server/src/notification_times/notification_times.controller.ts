@@ -25,9 +25,9 @@ export class NotificationTimesController {
     return this.notificationTimesService.create(createNotificationTimeDto);
   }
 
-  @Get()
-  findAll() {
-    return this.notificationTimesService.findAll();
+  @Get('notifications/:id')
+  findAll(@Param('id') notification_id: string) {
+    return this.notificationTimesService.findAll(notification_id);
   }
 
   @Get(':id')

@@ -23,14 +23,14 @@ export class NotificationsController {
     return this.notificationsService.create(createNotificationDto);
   }
 
-  @Get()
-  findAll() {
-    return this.notificationsService.findAll();
+  @Get(':med_id')
+  findAll(@Param('med_id') med_id: string) {
+    return this.notificationsService.findAll(med_id);
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.notificationsService.findOne(+id);
+    return this.notificationsService.findOne(id);
   }
 
   @Patch(':id')
@@ -38,11 +38,12 @@ export class NotificationsController {
     @Param('id') id: string,
     @Body() updateNotificationDto: UpdateNotificationDto,
   ) {
-    return this.notificationsService.update(+id, updateNotificationDto);
+    console.log(id);
+    return this.notificationsService.update(id, updateNotificationDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.notificationsService.remove(+id);
+    return this.notificationsService.remove(id);
   }
 }

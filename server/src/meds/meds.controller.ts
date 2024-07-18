@@ -51,8 +51,11 @@ export class MedsController {
   }
 
   @Get()
-  findAllByFilters(@Body() filteredMedDto: FilteredMedDto) {
-    return this.medsService.findAllByFilters(filteredMedDto);
+  findAllByFilters(
+    @Body() filteredMedDto: FilteredMedDto,
+    @Req() req: ReqWithToken,
+  ) {
+    return this.medsService.findAllByFilters(filteredMedDto, req.user.sub);
   }
 
   @Get(':id')

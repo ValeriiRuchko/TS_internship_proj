@@ -24,10 +24,7 @@ export class CategoryGroupsService {
         id: user_id,
       },
     });
-    this.logger.debug(
-      'Category group is created',
-      JSON.stringify(categoryGroup),
-    );
+    this.logger.debug('Category group is created', categoryGroup);
   }
 
   async findAll(user_id: string): Promise<CategoryGroup[]> {
@@ -62,12 +59,12 @@ export class CategoryGroupsService {
       { id: categoryGroup.id },
       updateCategoryGroupDto,
     );
-    this.logger.debug('Category_group update', JSON.stringify(CategoryGroup));
+    this.logger.debug('Category_group update', categoryGroup);
   }
 
   async remove(id: string): Promise<void> {
     const categoryGroup = await this.findOne(id);
     await this.categoryGroupsRepository.delete({ id: categoryGroup.id });
-    this.logger.debug('Category_group deleted', JSON.stringify(CategoryGroup));
+    this.logger.debug('Category_group deleted', categoryGroup);
   }
 }

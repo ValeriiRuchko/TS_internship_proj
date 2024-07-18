@@ -26,9 +26,16 @@ export class NotificationTimesService {
     );
   }
 
-  // TODO: change return type in Promise to NotificationTime[]
-  async findAll(): Promise<void> {
-    // return `This action returns all notificationTimes`;
+  async findAll(notification_id: string): Promise<NotificationTime[]> {
+    const notification_times = await this.notificationTimesRepository.find({
+      where: {
+        notification: {
+          id: notification_id,
+        },
+      },
+    });
+
+    return notification_times;
   }
 
   async findOne(id: string): Promise<NotificationTime> {
@@ -47,7 +54,18 @@ export class NotificationTimesService {
   async update(
     id: string,
     updateNotificationTimeDto: UpdateNotificationTimeDto,
-  ): Promise<void> {}
+  ): Promise<void> {
+    const notificationTime = await this.findOne(id);
+    await this.notificationTimesRepository.update(
+      { id: notificationTime.id },
+      updateNotificationTimeDto,
+    );
+    this.logger.debug('Notification time was updated', notificationTime);
+  }
 
-  async remove(id: string): Promise<void> {}
+  async remove(id: string): Promise<void> {
+    const notificationTime = await this.findOne(id);
+    await this.notificationTimesRepository.delete({ id: notificationTime.id });
+    this.logger.debug('Notification time deleted', notificationTime);
+  }
 }

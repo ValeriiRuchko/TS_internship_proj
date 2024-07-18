@@ -16,7 +16,7 @@ export class ImagesService {
 
   async create(createImageDto: CreateImageDto): Promise<void> {
     const image = await this.imagesRepository.save(createImageDto);
-    this.logger.debug('Image was created', JSON.stringify(image));
+    this.logger.debug('Image was created', image);
   }
 
   async findAllForMed(filteredImageDto: FilteredImageDto): Promise<Image[]> {
@@ -61,6 +61,6 @@ export class ImagesService {
       console.error('There was an error:', error.message);
     }
     await this.imagesRepository.delete({ id: image.id });
-    this.logger.debug('Image was deleted', JSON.stringify(image));
+    this.logger.debug('Image was deleted', image);
   }
 }

@@ -12,6 +12,7 @@ import { CategoryGroupsModule } from './category_groups/category_groups.module';
 import { CategoriesModule } from './categories/categories.module';
 import { NotificationTimesModule } from './notification_times/notification_times.module';
 import { AuthModule } from './auth/auth.module';
+import { EmailSenderModule } from './email-sender/email-sender.module';
 
 // that's the place where we essentially describe what providers (services) a controller can have
 // helps with DI
@@ -44,6 +45,7 @@ import { AuthModule } from './auth/auth.module';
     CategoriesModule,
     NotificationTimesModule,
     AuthModule,
+    EmailSenderModule,
   ],
   controllers: [AppController],
   providers: [AppService],

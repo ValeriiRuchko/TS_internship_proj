@@ -26,7 +26,7 @@ export class CategoriesService {
       ...createCategoryDto,
       categoryGroup,
     });
-    this.logger.debug('Category was created', JSON.stringify(res));
+    this.logger.debug('Category was created', res);
   }
 
   async findAll(
@@ -66,12 +66,12 @@ export class CategoriesService {
       { id: category.id },
       updateCategoryDto,
     );
-    this.logger.debug('Category was updated', JSON.stringify(category));
+    this.logger.debug('Category was updated', category);
   }
 
   async remove(id: string): Promise<void> {
     const category = await this.findOne(id);
     await this.categoriesRepository.delete({ id: category.id });
-    this.logger.debug('Category was deleted', JSON.stringify(category));
+    this.logger.debug('Category was deleted', category);
   }
 }
