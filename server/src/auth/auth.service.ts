@@ -5,7 +5,6 @@ import { RegisterUserDto } from './dto/register-user.dto';
 import { genSalt, hash } from 'bcrypt';
 import { LoginUserDto } from './dto/login.dto';
 import { User } from 'src/users/entities/users.entity';
-import { ReqWithToken } from 'src/types_&_interfaces/request.interface';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +13,7 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService,
-  ) { }
+  ) {}
 
   async signUp(registerUserDto: RegisterUserDto) {
     let existingUser: User | undefined;

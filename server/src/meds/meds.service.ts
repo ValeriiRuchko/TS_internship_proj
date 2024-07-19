@@ -8,6 +8,7 @@ import { Med } from './entities/meds.entity';
 import { ImagesService } from 'src/images/images.service';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { Repository } from 'typeorm';
+import { Notification } from 'src/notifications/entities/notifications.entity';
 
 @Injectable()
 export class MedsService {
@@ -43,26 +44,27 @@ export class MedsService {
   // WARN: creation of med without images, so after calling this service you need to call the one above
   // with proper med_id
   async create(createMedDto: CreateMedDto, user_id: string): Promise<Med> {
+    let notification: Notification | undefined;
+    if (createMedDto.notification) {
+      const temp = await this.notificationsService.create(
+        createMedDto.notification,
+      );
+      notification = temp;
+    }
     // saving med with related categories, also assigning the user and filling other options
     const med = await this.medsRepository.save({
       ...createMedDto,
+      notification,
       user: { id: user_id },
     });
 
-    // TODO: add notifications appropriately
-    if (createMedDto.notifications) {
-      // creating new notifications and relating them to the created med
-      for (let i = 0; i <= createMedDto.notifications.length - 1; i++) {
-        this.logger.warn('AAAAA');
-        // await this.notificationsService.create({ noti createMedDto.notifications[i], med });
-      }
-    }
     this.logger.debug('Med was created', med);
 
     return med;
   }
 
   // currently it works like with OR - some category or some other category
+  // TODO: rewrite to AND
   async findAllByFilters(
     filteredMedDto: FilteredMedDto,
     user_id: string,
@@ -98,6 +100,8 @@ export class MedsService {
     return res;
   }
 
+  // TODO: write this method to utilize this.notificationsService.update()
+  // maybe also change to upsert :D
   async update(id: string, updateMedDto: UpdateMedDto) {
     const med = await this.medsRepository.findOneBy({ id });
     if (!med) {

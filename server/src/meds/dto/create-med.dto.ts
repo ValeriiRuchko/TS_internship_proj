@@ -1,5 +1,6 @@
 import { IsDateString, IsInt, IsNotEmpty } from 'class-validator';
 import { Category } from 'src/categories/entities/category.entity';
+import { reminderDays } from 'src/notifications/dto/create-notification.dto';
 import { Notification } from 'src/notifications/entities/notifications.entity';
 
 export class CreateMedDto {
@@ -19,5 +20,7 @@ export class CreateMedDto {
 
   categories: Category[];
 
-  notifications: Notification[];
+  notification: Notification & {
+    reminderDays: reminderDays;
+  };
 }

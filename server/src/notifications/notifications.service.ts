@@ -7,14 +7,18 @@ import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notification } from './entities/notifications.entity';
 import { Repository } from 'typeorm';
+import { EmailSenderService } from 'src/email-sender/email-sender.service';
 
 @Injectable()
 export class NotificationsService {
   private readonly logger = new Logger(NotificationsService.name);
 
+  private readonly MAX_REMINDERDAYS_LENGTH = 7;
+
   constructor(
     @InjectRepository(Notification)
     private notificationsRepository: Repository<Notification>,
+    private emailSenderService: EmailSenderService,
   ) {}
 
   async create(
@@ -44,19 +48,32 @@ export class NotificationsService {
           id: med_id,
         },
       },
+      relations: {
+        notificationTimes: true,
+      },
     });
+    // TODO: move it to this.create, here for now for testing purposes
+    await this.emailSenderService.addCronJobForNotification(
+      notifications[0].id,
+      notifications[0],
+    );
     return notifications;
   }
 
   async findOne(id: string): Promise<Notification> {
-    const notification = await this.notificationsRepository.findOneBy({ id });
+    const notification = await this.notificationsRepository.findOne({
+      where: { id: id },
+      relations: {
+        notificationTimes: true,
+      },
+    });
     if (!notification) {
-      throw new HttpException('Category group not found', HttpStatus.NOT_FOUND);
+      throw new HttpException('Notification not found', HttpStatus.NOT_FOUND);
     }
+
     return notification;
   }
 
-  // TODO: THINK ABOUT WHERE TO PROCESS OUR NOTIFICATION_DAYS STRINGS - HERE OR ON FRONT-END
   async update(
     id: string,
     updateNotificationDto: UpdateNotificationDto,
@@ -106,12 +123,11 @@ export class NotificationsService {
 
     // NOTE: converting to string of format 0000100 to store properly in DB as now it is just 'number' value
     let reminderDaysInString = resultDays.toString(2);
-
-    const MAX_REMINDERDAYS_STRING_LENGTH = 7;
+    this.logger.debug('Reminder days before padding', reminderDaysInString);
 
     // NOTE: padding resulting string to neccessary length so that everything is stored in the same format
     reminderDaysInString = reminderDaysInString.padStart(
-      MAX_REMINDERDAYS_STRING_LENGTH,
+      this.MAX_REMINDERDAYS_LENGTH,
       '0',
     );
     this.logger.debug('Reminder days generated', reminderDaysInString);
