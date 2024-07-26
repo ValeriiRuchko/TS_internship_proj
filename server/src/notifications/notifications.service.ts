@@ -38,10 +38,17 @@ export class NotificationsService {
     });
 
     this.logger.debug('Notification was created', notification);
+
+    // // NOTE: adding new cron job
+    // await this.emailSenderService.addCronJobForNotification(
+    //   notification.id,
+    //   notification,
+    // );
+
     return notification;
   }
 
-  async findAll(med_id: string): Promise<Notification[]> {
+  async findAllForMed(med_id: string): Promise<Notification[]> {
     const notifications = await this.notificationsRepository.find({
       where: {
         med: {
@@ -52,11 +59,37 @@ export class NotificationsService {
         notificationTimes: true,
       },
     });
-    // TODO: move it to this.create, here for now for testing purposes
-    await this.emailSenderService.addCronJobForNotification(
-      notifications[0].id,
-      notifications[0],
-    );
+
+    return notifications;
+  }
+
+  async findAll(): Promise<Notification[]> {
+    const notifications = await this.notificationsRepository.find({
+      relations: {
+        notificationTimes: true,
+        med: {
+          user: true,
+        },
+      },
+      select: {
+        id: true,
+        notificationMsg: true,
+        reminderDays: true,
+        notificationTimes: {
+          id: true,
+          time: true,
+        },
+        med: {
+          id: true,
+          name: true,
+          user: {
+            id: true,
+            email: true,
+          },
+        },
+      },
+    });
+
     return notifications;
   }
 

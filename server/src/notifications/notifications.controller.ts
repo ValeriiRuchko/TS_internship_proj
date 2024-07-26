@@ -24,8 +24,13 @@ export class NotificationsController {
   }
 
   @Get(':med_id')
-  findAll(@Param('med_id') med_id: string) {
-    return this.notificationsService.findAll(med_id);
+  findAllForMed(@Param('med_id') med_id: string) {
+    return this.notificationsService.findAllForMed(med_id);
+  }
+
+  @Get()
+  findAll() {
+    return this.notificationsService.findAll();
   }
 
   @Get(':id')

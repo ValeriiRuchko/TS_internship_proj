@@ -63,8 +63,7 @@ export class MedsService {
     return med;
   }
 
-  // currently it works like with OR - some category or some other category
-  // TODO: rewrite to AND
+  // TODO: currently works as OR, maybe should work as AND??
   async findAllByFilters(
     filteredMedDto: FilteredMedDto,
     user_id: string,
@@ -83,6 +82,15 @@ export class MedsService {
         images: true,
       },
     });
+
+    // TODO: almost correct one, need to make dynamic now and with many andWhere clauses for multiple categories
+    const medsBuilder = await this.medsRepository
+      .createQueryBuilder('meds')
+      .innerJoinAndSelect('meds.categories', 'categories')
+      .where('categories.name = :name', { name: 'everyday' })
+      .getMany();
+
+    console.log(medsBuilder);
     return meds;
   }
 
