@@ -1,12 +1,11 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 import { Cron } from '@nestjs/schedule';
-import { Resend } from 'resend';
 import { Notification } from 'src/notifications/entities/notifications.entity';
 import { WeekDay } from 'src/notifications/enums/weekday.enum';
 import { NotificationsService } from 'src/notifications/notifications.service';
 import { Queue } from 'bullmq';
 import { InjectQueue } from '@nestjs/bullmq';
+import { CronPattern, CronPatternPart } from './types/cronPattern';
 
 @Injectable()
 export class EmailSenderService {
@@ -15,8 +14,6 @@ export class EmailSenderService {
   private readonly MAX_REMINDERDAYS_LENGTH = 7;
 
   constructor(
-    private configService: ConfigService,
-
     @Inject(forwardRef(() => NotificationsService))
     private notificationsService: NotificationsService,
 
@@ -28,14 +25,18 @@ export class EmailSenderService {
   async setupNotificationsOnStart() {
     const notifications = await this.notificationsService.findAll();
     for (let i = 0; i <= notifications.length - 1; i++) {
-      this.addCronJobForNotification(
+      const generatedCronPatterns = this.generateCronExpression(
+        notifications[i],
+      );
+      this.setupCronJobsForNotification(
         notifications[i].med.user.email,
+        generatedCronPatterns,
         notifications[i],
       );
     }
   }
 
-  async addCronJobForNotification(email: string, notification: Notification) {
+  generateCronExpression(notification: Notification): CronPattern[] {
     // tuple with defined position of elements of enum Weekday
     const WeekdaysTuple = [
       WeekDay.Monday,
@@ -86,39 +87,52 @@ export class EmailSenderService {
       }
     }
 
+    // day part of cron pattern
     const daysCronPattern = daysCronPatternArray.join(',');
 
-    const reminderTimes = notification.notificationTimes;
+    // getting time where notification should fire up
+    const cronPatternParts: CronPatternPart[] = [];
 
-    const reminderTimesCronPatternHoursArray: string[] = [];
-    const reminderTimesCronPatternMinutesArray: string[] = [];
-
-    for (const reminderTime of reminderTimes) {
+    for (const reminderTime of notification.notificationTimes) {
       const timeParts = reminderTime.time.split(':') as [
         string,
         string,
         string,
       ];
 
-      reminderTimesCronPatternHoursArray.push(
-        parseInt(timeParts[0]).toString(),
-      );
-      reminderTimesCronPatternMinutesArray.push(
-        parseInt(timeParts[1]).toString(),
-      );
+      cronPatternParts.push({
+        cronPatternHours: parseInt(timeParts[0]).toString(),
+        cronPatternMinutes: parseInt(timeParts[1]).toString(),
+        notificationTimeId: reminderTime.id,
+      });
     }
 
-    const finalCrons: string[] = [];
+    const cronsForJob: CronPattern[] = [];
 
-    for (let i = 0; i <= reminderTimesCronPatternHoursArray.length - 1; i++) {
-      const cronString = `0 ${reminderTimesCronPatternMinutesArray[i]} ${reminderTimesCronPatternHoursArray[i]} * * ${daysCronPattern}`;
-      finalCrons.push(cronString);
+    for (let i = 0; i <= cronPatternParts.length - 1; i++) {
+      const cronString = `0 ${cronPatternParts[i].cronPatternMinutes} ${cronPatternParts[i].cronPatternHours} * * ${daysCronPattern}`;
+      cronsForJob.push({
+        cronPattern: cronString,
+        notificationTimeId: cronPatternParts[i].notificationTimeId,
+      });
     }
 
-    for (const cronJob of finalCrons) {
+    // this.logger.debug('Notification times: ', notification.notificationTimes);
+    // this.logger.debug('Notification days-pattern: ', notification.reminderDays);
+    // this.logger.warn('Ready crons:', cronsForJob);
+
+    return cronsForJob;
+  }
+
+  async setupCronJobsForNotification(
+    email: string,
+    cronPatterns: CronPattern[],
+    notification: Notification,
+  ) {
+    for (const cronJob of cronPatterns) {
       // adding job to BullMQ queue
       const job = await this.notificationsQueue.add(
-        'set-up-notification',
+        `${notification.id}`,
         {
           email: email,
           notificationMsg: notification.notificationMsg,
@@ -126,39 +140,22 @@ export class EmailSenderService {
         },
         {
           repeat: {
-            pattern: cronJob,
+            pattern: cronJob.cronPattern,
+            key: cronJob.notificationTimeId,
           },
+          removeOnComplete: true,
         },
       );
+      this.logger.warn(
+        'All times for current notification: ',
+        notification.notificationTimes,
+      );
 
-      this.logger.debug('Notification will execute at: ', finalCrons);
+      this.logger.debug('Notification will execute at: ', cronJob);
 
       this.logger.debug(
         `Job ${job.name} for notification with days: ${notification.reminderDays} was set up`,
       );
-
-      this.logger.debug('Times for job: ', notification.notificationTimes);
     }
-  }
-
-  async sendNotificationEmail(message: string, email: string, medName: string) {
-    const key = this.configService.get('RESEND_API_KEY');
-    const resend = new Resend(key);
-
-    // NOTE: field from has test email suitable for testing of different things, might change it to
-    // my domain later
-    const { data, error } = await resend.emails.send({
-      from: 'Acme <onboarding@resend.dev>',
-      to: [`${email}`],
-      subject: `Reminder to take your med: ${medName}`,
-      html: `<p>${message}</p>`,
-    });
-
-    if (error) {
-      this.logger.error('Email sending failed, what the hell', error);
-      return;
-    }
-
-    this.logger.debug('Email sent with following data: ', data);
   }
 }
