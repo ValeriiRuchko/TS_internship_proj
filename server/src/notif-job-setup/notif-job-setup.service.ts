@@ -8,8 +8,8 @@ import { InjectQueue } from '@nestjs/bullmq';
 import { CronPattern, CronPatternPart } from './types/cronPattern';
 
 @Injectable()
-export class EmailSenderService {
-  private readonly logger = new Logger(EmailSenderService.name);
+export class NotifJobSetupService {
+  private readonly logger = new Logger(NotifJobSetupService.name);
 
   private readonly MAX_REMINDERDAYS_LENGTH = 7;
 
@@ -28,7 +28,7 @@ export class EmailSenderService {
       const generatedCronPatterns = this.generateCronExpression(
         notifications[i],
       );
-      this.setupCronJobsForNotification(
+      await this.setupCronJobsForNotification(
         notifications[i].med.user.email,
         generatedCronPatterns,
         notifications[i],
@@ -155,6 +155,21 @@ export class EmailSenderService {
 
       this.logger.debug(
         `Job ${job.name} for notification with days: ${notification.reminderDays} was set up`,
+      );
+    }
+  }
+
+  async deleteCronJobsForNotification(notification: Notification) {
+    for (const notificationTime of notification.notificationTimes) {
+      // NOTE: from first testing seems to work but if bugs occur might look here to add pattern too
+      const jobDeleted = await this.notificationsQueue.removeRepeatable(
+        notification.id,
+        {
+          key: notificationTime.id,
+        },
+      );
+      this.logger.debug(
+        `Job for notification ${notification.id} with time ${notificationTime} was deleted: ${jobDeleted}`,
       );
     }
   }

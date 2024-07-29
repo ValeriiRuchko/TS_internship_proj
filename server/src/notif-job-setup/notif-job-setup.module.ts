@@ -1,5 +1,5 @@
 import { forwardRef, Module } from '@nestjs/common';
-import { EmailSenderService } from './email-sender.service';
+import { NotifJobSetupService } from './notif-job-setup.service';
 import { ScheduleModule } from '@nestjs/schedule';
 import { NotificationsModule } from 'src/notifications/notifications.module';
 import { BullModule } from '@nestjs/bullmq';
@@ -23,7 +23,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       name: 'notifications',
     }),
   ],
-  providers: [EmailSenderService],
-  exports: [EmailSenderService],
+  providers: [NotifJobSetupService],
+  exports: [NotifJobSetupService],
 })
-export class EmailSenderModule {}
+export class NotifJobSetupModule { }

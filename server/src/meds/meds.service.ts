@@ -45,9 +45,11 @@ export class MedsService {
   // with proper med_id
   async create(createMedDto: CreateMedDto, user_id: string): Promise<Med> {
     let notification: Notification | undefined;
+    // TODO: rewrite completely to only find already created notification by id
     if (createMedDto.notification) {
       const temp = await this.notificationsService.create(
         createMedDto.notification,
+        user_id,
       );
       notification = temp;
     }
@@ -57,6 +59,8 @@ export class MedsService {
       notification,
       user: { id: user_id },
     });
+
+    // TODO: understand how to save notification so that it is related to med
 
     this.logger.debug('Med was created', med);
 

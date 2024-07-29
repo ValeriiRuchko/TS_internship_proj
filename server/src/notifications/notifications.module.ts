@@ -3,12 +3,14 @@ import { NotificationsService } from './notifications.service';
 import { NotificationsController } from './notifications.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Notification } from './entities/notifications.entity';
-import { EmailSenderModule } from 'src/email-sender/email-sender.module';
+import { NotifJobSetupModule } from 'src/notif-job-setup/notif-job-setup.module';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Notification]),
-    forwardRef(() => EmailSenderModule),
+    forwardRef(() => NotifJobSetupModule),
+    UsersModule,
   ],
   controllers: [NotificationsController],
   providers: [NotificationsService],

@@ -7,7 +7,8 @@ import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notification } from './entities/notifications.entity';
 import { Repository } from 'typeorm';
-import { EmailSenderService } from 'src/email-sender/email-sender.service';
+import { NotifJobSetupService } from 'src/notif-job-setup/notif-job-setup.service';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class NotificationsService {
@@ -18,11 +19,13 @@ export class NotificationsService {
   constructor(
     @InjectRepository(Notification)
     private notificationsRepository: Repository<Notification>,
-    private emailSenderService: EmailSenderService,
+    private emailSenderService: NotifJobSetupService,
+    private userService: UsersService,
   ) {}
 
   async create(
     createNotificationDto: CreateNotificationDto,
+    user_id: string,
   ): Promise<Notification> {
     // initial value which means notification has no day to repeat
     const emptyReminderDays = 0b0000000;
@@ -39,11 +42,19 @@ export class NotificationsService {
 
     this.logger.debug('Notification was created', notification);
 
-    // // NOTE: adding new cron job
-    // await this.emailSenderService.addCronJobForNotification(
-    //   notification.id,
-    //   notification,
-    // );
+    //gather necessary info & add notification to our message queue
+
+    const user = await this.userService.findOneById(user_id);
+    const email = user.email;
+
+    const cronPatterns =
+      this.emailSenderService.generateCronExpression(notification);
+
+    await this.emailSenderService.setupCronJobsForNotification(
+      email,
+      cronPatterns,
+      notification,
+    );
 
     return notification;
   }
@@ -110,6 +121,7 @@ export class NotificationsService {
   async update(
     id: string,
     updateNotificationDto: UpdateNotificationDto,
+    user_id: string,
   ): Promise<void> {
     const notification = await this.findOne(id);
 
@@ -131,12 +143,33 @@ export class NotificationsService {
     });
 
     this.logger.debug('Notification was updated', notification);
+
+    // update notification in message queue
+    // 1: Remove old job
+    await this.emailSenderService.deleteCronJobsForNotification(notification);
+
+    const updatedNotification = await this.findOne(id);
+
+    // 2: create new job
+    const cronPatterns =
+      this.emailSenderService.generateCronExpression(updatedNotification);
+    const user = await this.userService.findOneById(user_id);
+    const email = user.email;
+
+    await this.emailSenderService.setupCronJobsForNotification(
+      email,
+      cronPatterns,
+      updatedNotification,
+    );
   }
 
   async remove(id: string): Promise<void> {
     const notification = await this.findOne(id);
     await this.notificationsRepository.delete({ id });
     this.logger.debug('Notification was deleted', notification);
+
+    // remove notifications from message queue
+    await this.emailSenderService.deleteCronJobsForNotification(notification);
   }
 
   // NOTE: HELPER FUNCTION TO WORK WITH OUR DAYS REPRESENTATION
