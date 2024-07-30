@@ -1,6 +1,6 @@
-// @/src/db/seeding/factories/notification.factory.ts
+
 import { setSeederFactory } from 'typeorm-extension';
-import { Notification } from 'src/notifications/entities/notifications.entity';
+import { Notification } from '../../notifications/entities/notifications.entity';
 
 export const NotificationFactory = setSeederFactory(Notification, (faker) => {
   const notification = new Notification();

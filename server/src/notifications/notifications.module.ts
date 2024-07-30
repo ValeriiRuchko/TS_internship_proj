@@ -3,8 +3,8 @@ import { NotificationsService } from './notifications.service';
 import { NotificationsController } from './notifications.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Notification } from './entities/notifications.entity';
-import { NotifJobSetupModule } from 'src/notif-job-setup/notif-job-setup.module';
-import { UsersModule } from 'src/users/users.module';
+import { NotifJobSetupModule } from '../notif-job-setup/notif-job-setup.module';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
@@ -16,4 +16,4 @@ import { UsersModule } from 'src/users/users.module';
   providers: [NotificationsService],
   exports: [NotificationsService],
 })
-export class NotificationsModule {}
+export class NotificationsModule { }

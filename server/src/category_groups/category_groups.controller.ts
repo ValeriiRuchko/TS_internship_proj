@@ -13,12 +13,12 @@ import { CategoryGroupsService } from './category_groups.service';
 import { CreateCategoryGroupDto } from './dto/create-category_group.dto';
 import { UpdateCategoryGroupDto } from './dto/update-category_group.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { ReqWithToken } from 'src/types_&_interfaces/request.interface';
+import { ReqWithToken } from '../types_&_interfaces/request.interface';
 
 @Controller('category-groups')
 @UseGuards(AuthGuard('jwt'))
 export class CategoryGroupsController {
-  constructor(private readonly categoryGroupsService: CategoryGroupsService) {}
+  constructor(private readonly categoryGroupsService: CategoryGroupsService) { }
 
   @Post()
   create(

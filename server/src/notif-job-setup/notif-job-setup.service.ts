@@ -1,8 +1,8 @@
 import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
-import { Notification } from 'src/notifications/entities/notifications.entity';
-import { WeekDay } from 'src/notifications/enums/weekday.enum';
-import { NotificationsService } from 'src/notifications/notifications.service';
+import { Notification } from '../notifications/entities/notifications.entity';
+import { WeekDay } from '../notifications/enums/weekday.enum';
+import { NotificationsService } from '../notifications/notifications.service';
 import { Queue } from 'bullmq';
 import { InjectQueue } from '@nestjs/bullmq';
 import { CronPattern, CronPatternPart } from './types/cronPattern';
@@ -18,8 +18,9 @@ export class NotifJobSetupService {
     private notificationsService: NotificationsService,
 
     @InjectQueue('notifications') private notificationsQueue: Queue,
-  ) {}
+  ) { }
 
+  // TODO: uncomment cron
   // NOTE: main starter of notifications on app startup
   @Cron(new Date(Date.now() + 5 * 1000), { name: 'EMAIL_SEND_CRON' })
   async setupNotificationsOnStart() {

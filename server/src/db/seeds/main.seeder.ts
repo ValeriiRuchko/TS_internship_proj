@@ -1,13 +1,13 @@
-// src/db/seeds/user.seeder.ts
+// ../../db/seeds/user.seeder.ts
 import { Seeder, SeederFactoryManager } from 'typeorm-extension';
 import { DataSource } from 'typeorm';
-import { CategoryGroup } from 'src/category_groups/entities/category_group.entity';
-import { Category } from 'src/categories/entities/category.entity';
-import { Med } from 'src/meds/entities/meds.entity';
-import { User } from 'src/users/entities/users.entity';
-import { Image } from 'src/images/entities/image.entity';
-import { Notification } from 'src/notifications/entities/notifications.entity';
-import { NotificationTime } from 'src/notification_times/entities/notification_time.entity';
+import { CategoryGroup } from '../../category_groups/entities/category_group.entity';
+import { Category } from '../../categories/entities/category.entity';
+import { Med } from '../../meds/entities/meds.entity';
+import { User } from '../../users/entities/users.entity';
+import { Image } from '../../images/entities/image.entity';
+import { Notification } from '../../notifications/entities/notifications.entity';
+import { NotificationTime } from '../../notification_times/entities/notification_time.entity';
 // ---
 import { faker } from '@faker-js/faker';
 

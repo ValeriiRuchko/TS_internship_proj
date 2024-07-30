@@ -1,14 +1,14 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CategoriesService } from 'src/categories/categories.service';
+import { CategoriesService } from '../categories/categories.service';
 import { CreateMedDto } from './dto/create-med.dto';
 import { FilteredMedDto } from './dto/find-filtered.dto';
 import { UpdateMedDto } from './dto/update-med.dto';
 import { Med } from './entities/meds.entity';
-import { ImagesService } from 'src/images/images.service';
-import { NotificationsService } from 'src/notifications/notifications.service';
+import { ImagesService } from '../images/images.service';
+import { NotificationsService } from '../notifications/notifications.service';
 import { Repository } from 'typeorm';
-import { Notification } from 'src/notifications/entities/notifications.entity';
+import { Notification } from '../notifications/entities/notifications.entity';
 
 @Injectable()
 export class MedsService {
@@ -19,7 +19,7 @@ export class MedsService {
     private imagesService: ImagesService,
     private notificationsService: NotificationsService,
     private categoriesService: CategoriesService,
-  ) {}
+  ) { }
 
   async createImagesForMed(
     files: Array<Express.Multer.File>,
@@ -47,11 +47,10 @@ export class MedsService {
     let notification: Notification | undefined;
     // TODO: rewrite completely to only find already created notification by id
     if (createMedDto.notification) {
-      const temp = await this.notificationsService.create(
-        createMedDto.notification,
-        user_id,
+      // NOTE: we make an assumption that notification was created in previous POST-req from client
+      notification = await this.notificationsService.findOne(
+        createMedDto.notification.id,
       );
-      notification = temp;
     }
     // saving med with related categories, also assigning the user and filling other options
     const med = await this.medsRepository.save({
@@ -60,19 +59,16 @@ export class MedsService {
       user: { id: user_id },
     });
 
-    // TODO: understand how to save notification so that it is related to med
-
     this.logger.debug('Med was created', med);
 
     return med;
   }
 
-  // TODO: currently works as OR, maybe should work as AND??
   async findAllByFilters(
     filteredMedDto: FilteredMedDto,
     user_id: string,
   ): Promise<Med[]> {
-    // actual query
+    // old variant with OR
     const meds = await this.medsRepository.find({
       where: {
         user: {
@@ -87,14 +83,28 @@ export class MedsService {
       },
     });
 
-    // TODO: almost correct one, need to make dynamic now and with many andWhere clauses for multiple categories
-    const medsBuilder = await this.medsRepository
-      .createQueryBuilder('meds')
-      .innerJoinAndSelect('meds.categories', 'categories')
-      .where('categories.name = :name', { name: 'everyday' })
-      .getMany();
+    // const categories = filteredMedDto.categories.map((c) => c.name);
+    // //
+    // const medsQuery = this.medsRepository
+    //   .createQueryBuilder('meds')
+    //   .innerJoinAndSelect('meds.categories', 'categories')
+    //   .where('meds.userId = :user_id', { user_id: user_id })
+    //   .andWhere('categories.name IN (:...categories)', { categories })
+    //   .groupBy('meds.id')
+    //   .having('COUNT(DISTINCT categories.name) = :length', {
+    //     length: categories.length,
+    //   })
+    //   .select([
+    //     'meds.name',
+    //     'meds.description',
+    //     'meds.pillsAmount',
+    //     'meds.expirationDate',
+    //   ]);
+    //
+    // // this.logger.debug(medsQuery.getQueryAndParameters());
+    // const meds = await medsQuery.getMany();
+    // this.logger.debug(meds);
 
-    console.log(medsBuilder);
     return meds;
   }
 
@@ -112,8 +122,6 @@ export class MedsService {
     return res;
   }
 
-  // TODO: write this method to utilize this.notificationsService.update()
-  // maybe also change to upsert :D
   async update(id: string, updateMedDto: UpdateMedDto) {
     const med = await this.medsRepository.findOneBy({ id });
     if (!med) {

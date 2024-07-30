@@ -7,8 +7,8 @@ import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Notification } from './entities/notifications.entity';
 import { Repository } from 'typeorm';
-import { NotifJobSetupService } from 'src/notif-job-setup/notif-job-setup.service';
-import { UsersService } from 'src/users/users.service';
+import { NotifJobSetupService } from '../notif-job-setup/notif-job-setup.service';
+import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class NotificationsService {
@@ -21,7 +21,7 @@ export class NotificationsService {
     private notificationsRepository: Repository<Notification>,
     private emailSenderService: NotifJobSetupService,
     private userService: UsersService,
-  ) {}
+  ) { }
 
   async create(
     createNotificationDto: CreateNotificationDto,

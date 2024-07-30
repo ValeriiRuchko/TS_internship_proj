@@ -1,6 +1,6 @@
-// @/src/db/seeding/factories/user.factory.ts
+
 import { setSeederFactory } from 'typeorm-extension';
-import { User } from 'src/users/entities/users.entity';
+import { User } from '../../users/entities/users.entity';
 import { genSalt, hash } from 'bcrypt';
 
 export const UserFactory = setSeederFactory(User, async (faker) => {

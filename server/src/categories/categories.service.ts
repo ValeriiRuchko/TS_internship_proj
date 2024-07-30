@@ -4,8 +4,8 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CategoryGroupsService } from 'src/category_groups/category_groups.service';
-import { CategoryGroup } from 'src/category_groups/entities/category_group.entity';
+import { CategoryGroupsService } from '../category_groups/category_groups.service';
+import { CategoryGroup } from '../category_groups/entities/category_group.entity';
 
 @Injectable()
 export class CategoriesService {
@@ -16,7 +16,7 @@ export class CategoriesService {
     private categoriesRepository: Repository<Category>,
     private categoryGroupsService: CategoryGroupsService,
     // private userService: UsersService,
-  ) {}
+  ) { }
 
   async create(createCategoryDto: CreateCategoryDto): Promise<void> {
     const categoryGroup = await this.categoryGroupsService.findOne(

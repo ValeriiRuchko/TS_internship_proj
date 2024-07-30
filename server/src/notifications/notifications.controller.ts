@@ -13,12 +13,12 @@ import { NotificationsService } from './notifications.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { ReqWithToken } from 'src/types_&_interfaces/request.interface';
+import { ReqWithToken } from '../types_&_interfaces/request.interface';
 
 @Controller('notifications')
 @UseGuards(AuthGuard('jwt'))
 export class NotificationsController {
-  constructor(private readonly notificationsService: NotificationsService) {}
+  constructor(private readonly notificationsService: NotificationsService) { }
 
   @Post()
   create(

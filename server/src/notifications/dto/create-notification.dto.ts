@@ -1,6 +1,6 @@
 import { IsDateString, IsNumber } from 'class-validator';
-import { Med } from 'src/meds/entities/meds.entity';
-import { NotificationTime } from 'src/notification_times/entities/notification_time.entity';
+import { Med } from '../../meds/entities/meds.entity';
+import { NotificationTime } from '../../notification_times/entities/notification_time.entity';
 import { WeekDay } from '../enums/weekday.enum';
 
 export type reminderDays = {

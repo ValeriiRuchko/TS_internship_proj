@@ -2,9 +2,9 @@ import { Module } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CategoriesController } from './categories.controller';
 // import { APP_GUARD } from '@nestjs/core';
-// import { PremiumGuard } from 'src/auth/premium.guard';
-import { AuthModule } from 'src/auth/auth.module';
-import { CategoryGroupsModule } from 'src/category_groups/category_groups.module';
+// import { PremiumGuard } from '../auth/premium.guard';
+import { AuthModule } from '../auth/auth.module';
+import { CategoryGroupsModule } from '../category_groups/category_groups.module';
 import { Category } from './entities/category.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
@@ -21,4 +21,4 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   ],
   exports: [TypeOrmModule, CategoriesService],
 })
-export class CategoriesModule {}
+export class CategoriesModule { }

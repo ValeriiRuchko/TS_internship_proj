@@ -1,7 +1,7 @@
 import { forwardRef, Module } from '@nestjs/common';
 import { NotifJobSetupService } from './notif-job-setup.service';
 import { ScheduleModule } from '@nestjs/schedule';
-import { NotificationsModule } from 'src/notifications/notifications.module';
+import { NotificationsModule } from '../notifications/notifications.module';
 import { BullModule } from '@nestjs/bullmq';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
