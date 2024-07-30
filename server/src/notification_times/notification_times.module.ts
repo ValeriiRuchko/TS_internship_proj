@@ -8,5 +8,6 @@ import { NotificationTime } from './entities/notification_time.entity';
   imports: [TypeOrmModule.forFeature([NotificationTime])],
   controllers: [NotificationTimesController],
   providers: [NotificationTimesService],
+  exports: [NotificationTimesService],
 })
 export class NotificationTimesModule {}

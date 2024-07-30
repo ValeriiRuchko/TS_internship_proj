@@ -4,13 +4,20 @@ import { Job } from 'bullmq';
 import { NotificationJobData } from './types_&_interfaces/job-data';
 import { ConfigService } from '@nestjs/config';
 import { Resend } from 'resend';
+import { Cron } from '@nestjs/schedule';
+import { NotificationsService } from 'src/notifications/notifications.service';
+import { NotifJobSetupService } from 'src/notif-job-setup/notif-job-setup.service';
 
 @Processor('notifications')
 @Injectable()
 export class NotificationsConsumerService extends WorkerHost {
   private readonly logger = new Logger(NotificationsConsumerService.name);
 
-  constructor(private configService: ConfigService) {
+  constructor(
+    private configService: ConfigService,
+    private notificationsService: NotificationsService,
+    private notifsJobSetupService: NotifJobSetupService,
+  ) {
     super();
   }
 
@@ -45,5 +52,20 @@ export class NotificationsConsumerService extends WorkerHost {
     }
 
     this.logger.debug('Email sent with following data: ', data);
+  }
+
+  // NOTE: main starter of notifications on app startup
+  @Cron(new Date(Date.now() + 5 * 1000), { name: 'EMAIL_SEND_CRON' })
+  async setupNotificationsOnStart() {
+    const notifications = await this.notificationsService.findAll();
+    for (let i = 0; i <= notifications.length - 1; i++) {
+      const generatedCronPatterns =
+        this.notifsJobSetupService.generateCronExpression(notifications[i]);
+      await this.notifsJobSetupService.setupCronJobsForNotification(
+        notifications[i].med.user.email,
+        generatedCronPatterns,
+        notifications[i],
+      );
+    }
   }
 }

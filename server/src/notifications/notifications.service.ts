@@ -19,9 +19,11 @@ export class NotificationsService {
   constructor(
     @InjectRepository(Notification)
     private notificationsRepository: Repository<Notification>,
-    private emailSenderService: NotifJobSetupService,
+
+    private notifJobSetupService: NotifJobSetupService,
+
     private userService: UsersService,
-  ) { }
+  ) {}
 
   async create(
     createNotificationDto: CreateNotificationDto,
@@ -48,9 +50,9 @@ export class NotificationsService {
     const email = user.email;
 
     const cronPatterns =
-      this.emailSenderService.generateCronExpression(notification);
+      this.notifJobSetupService.generateCronExpression(notification);
 
-    await this.emailSenderService.setupCronJobsForNotification(
+    await this.notifJobSetupService.setupCronJobsForNotification(
       email,
       cronPatterns,
       notification,
@@ -146,17 +148,17 @@ export class NotificationsService {
 
     // update notification in message queue
     // 1: Remove old job
-    await this.emailSenderService.deleteCronJobsForNotification(notification);
+    await this.notifJobSetupService.deleteCronJobsForNotification(notification);
 
     const updatedNotification = await this.findOne(id);
 
     // 2: create new job
     const cronPatterns =
-      this.emailSenderService.generateCronExpression(updatedNotification);
+      this.notifJobSetupService.generateCronExpression(updatedNotification);
     const user = await this.userService.findOneById(user_id);
     const email = user.email;
 
-    await this.emailSenderService.setupCronJobsForNotification(
+    await this.notifJobSetupService.setupCronJobsForNotification(
       email,
       cronPatterns,
       updatedNotification,
@@ -169,7 +171,7 @@ export class NotificationsService {
     this.logger.debug('Notification was deleted', notification);
 
     // remove notifications from message queue
-    await this.emailSenderService.deleteCronJobsForNotification(notification);
+    await this.notifJobSetupService.deleteCronJobsForNotification(notification);
   }
 
   // NOTE: HELPER FUNCTION TO WORK WITH OUR DAYS REPRESENTATION

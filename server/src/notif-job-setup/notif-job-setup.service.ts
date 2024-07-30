@@ -1,8 +1,6 @@
-import { forwardRef, Inject, Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Injectable, Logger } from '@nestjs/common';
 import { Notification } from '../notifications/entities/notifications.entity';
 import { WeekDay } from '../notifications/enums/weekday.enum';
-import { NotificationsService } from '../notifications/notifications.service';
 import { Queue } from 'bullmq';
 import { InjectQueue } from '@nestjs/bullmq';
 import { CronPattern, CronPatternPart } from './types/cronPattern';
@@ -14,28 +12,8 @@ export class NotifJobSetupService {
   private readonly MAX_REMINDERDAYS_LENGTH = 7;
 
   constructor(
-    @Inject(forwardRef(() => NotificationsService))
-    private notificationsService: NotificationsService,
-
     @InjectQueue('notifications') private notificationsQueue: Queue,
-  ) { }
-
-  // TODO: uncomment cron
-  // NOTE: main starter of notifications on app startup
-  @Cron(new Date(Date.now() + 5 * 1000), { name: 'EMAIL_SEND_CRON' })
-  async setupNotificationsOnStart() {
-    const notifications = await this.notificationsService.findAll();
-    for (let i = 0; i <= notifications.length - 1; i++) {
-      const generatedCronPatterns = this.generateCronExpression(
-        notifications[i],
-      );
-      await this.setupCronJobsForNotification(
-        notifications[i].med.user.email,
-        generatedCronPatterns,
-        notifications[i],
-      );
-    }
-  }
+  ) {}
 
   generateCronExpression(notification: Notification): CronPattern[] {
     // tuple with defined position of elements of enum Weekday

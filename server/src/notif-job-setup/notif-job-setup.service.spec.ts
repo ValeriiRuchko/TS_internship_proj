@@ -3,6 +3,9 @@ import { NotifJobSetupService } from './notif-job-setup.service';
 import { Notification } from '../notifications/entities/notifications.entity';
 import { NotificationTime } from '../notification_times/entities/notification_time.entity';
 import { CronPattern } from './types/cronPattern';
+import { NotificationsModule } from 'src/notifications/notifications.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 describe('NotifJobSetupService', () => {
   let service: NotifJobSetupService;
@@ -10,9 +13,18 @@ describe('NotifJobSetupService', () => {
   let notificationTime1: NotificationTime;
   let notificationTime2: NotificationTime;
 
+  // const mockNotificationsService = jest.fn();
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [NotifJobSetupService],
+      providers: [
+        NotifJobSetupService,
+        {
+          provide: NotificationsService,
+          useValue: {},
+        },
+      ],
+      imports: [NotificationsModule],
     }).compile();
 
     service = module.get<NotifJobSetupService>(NotifJobSetupService);

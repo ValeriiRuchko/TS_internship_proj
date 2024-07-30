@@ -9,11 +9,11 @@ import { UsersModule } from '../users/users.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Notification]),
-    forwardRef(() => NotifJobSetupModule),
+    NotifJobSetupModule,
     UsersModule,
   ],
   controllers: [NotificationsController],
   providers: [NotificationsService],
   exports: [NotificationsService],
 })
-export class NotificationsModule { }
+export class NotificationsModule {}
