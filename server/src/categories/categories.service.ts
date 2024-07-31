@@ -16,7 +16,7 @@ export class CategoriesService {
     private categoriesRepository: Repository<Category>,
     private categoryGroupsService: CategoryGroupsService,
     // private userService: UsersService,
-  ) { }
+  ) {}
 
   async create(createCategoryDto: CreateCategoryDto): Promise<void> {
     const categoryGroup = await this.categoryGroupsService.findOne(

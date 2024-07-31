@@ -19,7 +19,7 @@ export class MedsService {
     private imagesService: ImagesService,
     private notificationsService: NotificationsService,
     private categoriesService: CategoriesService,
-  ) { }
+  ) {}
 
   async createImagesForMed(
     files: Array<Express.Multer.File>,
@@ -45,7 +45,6 @@ export class MedsService {
   // with proper med_id
   async create(createMedDto: CreateMedDto, user_id: string): Promise<Med> {
     let notification: Notification | undefined;
-    // TODO: rewrite completely to only find already created notification by id
     if (createMedDto.notification) {
       // NOTE: we make an assumption that notification was created in previous POST-req from client
       notification = await this.notificationsService.findOne(
@@ -83,16 +82,18 @@ export class MedsService {
       },
     });
 
-    // const categories = filteredMedDto.categories.map((c) => c.name);
+    // const category_names = filteredMedDto.categories.map((c) => c.name);
     // //
     // const medsQuery = this.medsRepository
     //   .createQueryBuilder('meds')
     //   .innerJoinAndSelect('meds.categories', 'categories')
     //   .where('meds.userId = :user_id', { user_id: user_id })
-    //   .andWhere('categories.name IN (:...categories)', { categories })
+    //   .andWhere('categories.name IN (:...categories)', {
+    //     categories: category_names,
+    //   })
     //   .groupBy('meds.id')
     //   .having('COUNT(DISTINCT categories.name) = :length', {
-    //     length: categories.length,
+    //     length: category_names.length,
     //   })
     //   .select([
     //     'meds.name',

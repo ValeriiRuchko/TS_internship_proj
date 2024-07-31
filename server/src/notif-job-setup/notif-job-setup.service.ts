@@ -132,9 +132,9 @@ export class NotifJobSetupService {
 
       this.logger.debug('Notification will execute at: ', cronJob);
 
-      this.logger.debug(
-        `Job ${job.name} for notification with days: ${notification.reminderDays} was set up`,
-      );
+      // this.logger.debug(
+      //   `Job ${job.name} for notification with days: ${notification.reminderDays} was set up`,
+      // );
     }
   }
 

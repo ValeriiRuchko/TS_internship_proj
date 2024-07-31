@@ -19,7 +19,7 @@ import { ReqWithToken } from '../types_&_interfaces/request.interface';
 @Controller('categories')
 @UseGuards(AuthGuard('jwt'))
 export class CategoriesController {
-  constructor(private readonly categoriesService: CategoriesService) { }
+  constructor(private readonly categoriesService: CategoriesService) {}
 
   @Post()
   // @Roles(Role.Premium)

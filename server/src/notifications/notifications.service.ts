@@ -61,8 +61,8 @@ export class NotificationsService {
     return notification;
   }
 
-  async findAllForMed(med_id: string): Promise<Notification[]> {
-    const notifications = await this.notificationsRepository.find({
+  async findNotificationForMed(med_id: string): Promise<Notification> {
+    const notification = await this.notificationsRepository.findOneOrFail({
       where: {
         med: {
           id: med_id,
@@ -73,7 +73,7 @@ export class NotificationsService {
       },
     });
 
-    return notifications;
+    return notification;
   }
 
   async findAll(): Promise<Notification[]> {
