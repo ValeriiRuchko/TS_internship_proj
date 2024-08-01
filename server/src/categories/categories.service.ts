@@ -29,7 +29,7 @@ export class CategoriesService {
     this.logger.debug('Category was created', res);
   }
 
-  async findAll(
+  async findAllInCategoryGroup(
     categoryGroup: CategoryGroup,
     user_id: string,
   ): Promise<Category[]> {
