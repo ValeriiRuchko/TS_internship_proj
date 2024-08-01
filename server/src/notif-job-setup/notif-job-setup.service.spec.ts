@@ -45,6 +45,7 @@ describe('NotifJobSetupService', () => {
       .overrideProvider(getQueueToken('notifications'))
       .useValue({
         add: jest.fn(),
+        removeRepeatable: jest.fn().mockResolvedValue(true),
       })
       .compile();
 
@@ -67,15 +68,15 @@ describe('NotifJobSetupService', () => {
   });
 
   it('must be called with specified params', async () => {
-    const mockF = jest.spyOn(service, 'setupCronJobsForNotification');
+    const setupJobsSpy = jest.spyOn(service, 'setupCronJobsForNotification');
+    const queueAddSpy = jest.spyOn(queue1, 'add');
+
     const patterns = service.generateCronExpression(notification);
     const email = 'hello@gmail.com';
-    const res = await service.setupCronJobsForNotification(
-      email,
-      patterns,
-      notification,
-    );
-    expect(mockF).toHaveBeenCalledWith(
+
+    await service.setupCronJobsForNotification(email, patterns, notification);
+
+    expect(setupJobsSpy).toHaveBeenCalledWith(
       'hello@gmail.com',
       [
         { notificationTimeId: '2', cronPattern: '0 43 12 * * 2,3,5,7' },
@@ -83,5 +84,43 @@ describe('NotifJobSetupService', () => {
       ],
       notification,
     );
+
+    expect(queueAddSpy).toHaveBeenCalledWith(
+      '1',
+      {
+        email: 'hello@gmail.com',
+        notificationMsg: 'Take your medication',
+        medName: 'Random med',
+      },
+      {
+        repeat: {
+          pattern: '0 43 12 * * 2,3,5,7',
+          key: '2',
+        },
+        removeOnComplete: true,
+      },
+    );
+
+    expect(queueAddSpy).toHaveBeenCalledWith(
+      '1',
+      {
+        email: 'hello@gmail.com',
+        notificationMsg: 'Take your medication',
+        medName: 'Random med',
+      },
+      {
+        repeat: {
+          pattern: '0 5 23 * * 2,3,5,7',
+          key: '3',
+        },
+        removeOnComplete: true,
+      },
+    );
+  });
+
+  it('must return array of true', async () => {
+    const deleteResult =
+      await service.deleteCronJobsForNotification(notification);
+    expect(deleteResult).toEqual([true, true]);
   });
 });

@@ -139,6 +139,7 @@ export class NotifJobSetupService {
   }
 
   async deleteCronJobsForNotification(notification: Notification) {
+    const resultOfDeletion: boolean[] = [];
     for (const notificationTime of notification.notificationTimes) {
       // NOTE: from first testing seems to work but if bugs occur might look here to add pattern too
       const jobDeleted = await this.notificationsQueue.removeRepeatable(
@@ -150,6 +151,8 @@ export class NotifJobSetupService {
       this.logger.debug(
         `Job for notification ${notification.id} with time ${notificationTime} was deleted: ${jobDeleted}`,
       );
+      resultOfDeletion.push(jobDeleted);
     }
+    return resultOfDeletion;
   }
 }

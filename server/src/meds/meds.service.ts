@@ -129,12 +129,7 @@ export class MedsService {
       throw new HttpException('Med not found', HttpStatus.NOT_FOUND);
     }
 
-    await this.medsRepository.update(
-      { id },
-      {
-        ...updateMedDto,
-      },
-    );
+    await this.medsRepository.update({ id }, updateMedDto);
     this.logger.debug('Med updated', med);
   }
 

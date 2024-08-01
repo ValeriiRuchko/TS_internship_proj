@@ -22,7 +22,7 @@ testCategoryOne.id = '1';
 testCategoryOne.name = 'vitamins';
 testCategoryOne.categoryGroup = categoryGr;
 const testCategoryTwo = new Category();
-testCategoryOne.id = '2';
+testCategoryTwo.id = '2';
 testCategoryTwo.name = 'painkillers';
 testCategoryTwo.categoryGroup = categoryGr;
 
@@ -37,6 +37,7 @@ const reqWithToken: ReqWithToken = {
 
 describe('CategoriesController', () => {
   let controller: CategoriesController;
+  let service: CategoriesService;
   // let repo: jest.Mocked<Repository<Category>>;
 
   beforeEach(async () => {
@@ -46,7 +47,7 @@ describe('CategoriesController', () => {
         {
           provide: CategoriesService,
           useValue: {
-            findAll: jest
+            findAllInCategoryGroup: jest
               .fn()
               .mockResolvedValue([testCategoryOne, testCategoryTwo]),
             findOne: jest.fn().mockImplementation((id: string) =>
@@ -58,7 +59,7 @@ describe('CategoriesController', () => {
             create: jest
               .fn()
               .mockImplementation((category: CreateCategoryDto) =>
-                Promise.resolve({ id: '3', ...category }),
+                Promise.resolve({ id: '1', ...category }),
               ),
             updateOne: jest
               .fn()
@@ -72,6 +73,7 @@ describe('CategoriesController', () => {
     }).compile();
 
     controller = module.get<CategoriesController>(CategoriesController);
+    service = module.get(CategoriesService);
     // repo = module.get(getRepositoryToken(Category));
   });
 
@@ -79,9 +81,30 @@ describe('CategoriesController', () => {
     expect(controller).toBeDefined();
   });
 
-  it('should return all categories', async () => {
-    await expect(controller.findAll(categoryGr, reqWithToken)).resolves.toEqual(
-      categoriesArray,
-    );
+  describe('findAll categories in category group controller', () => {
+    it('should return all categories', async () => {
+      const categories = await controller.findAll(categoryGr, reqWithToken);
+      const serviceSpy = jest.spyOn(service, 'findAllInCategoryGroup');
+
+      expect(categories).toEqual(categoriesArray);
+      expect(serviceSpy).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('create category controller', () => {
+    it('should return created category', async () => {
+      const category = await controller.create({
+        name: 'vitamins',
+        categoryGroup: categoryGr,
+      });
+      const serviceSpy = jest.spyOn(service, 'create');
+
+      expect(category).toEqual(testCategoryOne);
+      expect(serviceSpy).toHaveBeenCalledTimes(1);
+      expect(serviceSpy).toHaveBeenCalledWith({
+        name: testCategoryOne.name,
+        categoryGroup: testCategoryOne.categoryGroup,
+      });
+    });
   });
 });
