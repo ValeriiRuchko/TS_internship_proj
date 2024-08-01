@@ -12,7 +12,8 @@ import { CategoryGroupsModule } from './category_groups/category_groups.module';
 import { CategoriesModule } from './categories/categories.module';
 import { NotificationTimesModule } from './notification_times/notification_times.module';
 import { AuthModule } from './auth/auth.module';
-import { EmailSenderModule } from './email-sender/email-sender.module';
+import { NotifJobSetupModule } from './notif-job-setup/notif-job-setup.module';
+import { NotificationsConsumerModule } from './notifications-consumer/notifications-consumer.module';
 
 // that's the place where we essentially describe what providers (services) a controller can have
 // helps with DI
@@ -45,12 +46,13 @@ import { EmailSenderModule } from './email-sender/email-sender.module';
     CategoriesModule,
     NotificationTimesModule,
     AuthModule,
-    EmailSenderModule,
+    NotifJobSetupModule,
+    NotificationsConsumerModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {
   // eslint-disable-next-line prettier/prettier
-  constructor(private dataSource: DataSource) {}
+  constructor(private dataSource: DataSource) { }
 }

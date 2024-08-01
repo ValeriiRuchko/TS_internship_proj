@@ -12,12 +12,12 @@ import { ImagesService } from './images.service';
 import { CreateImageDto } from './dto/create-image.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { FilteredImageDto } from './dto/find-filtered.dto';
-import { ReqWithToken } from 'src/types_&_interfaces/request.interface';
+import { ReqWithToken } from '../types_&_interfaces/request.interface';
 
 @Controller('images')
 @UseGuards(AuthGuard('jwt'))
 export class ImagesController {
-  constructor(private readonly imagesService: ImagesService) {}
+  constructor(private readonly imagesService: ImagesService) { }
 
   @Post()
   create(@Body() createImageDto: CreateImageDto) {

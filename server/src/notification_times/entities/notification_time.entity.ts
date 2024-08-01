@@ -1,4 +1,4 @@
-import { Notification } from 'src/notifications/entities/notifications.entity';
+import { Notification } from '../../notifications/entities/notifications.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity({ name: 'notification_times' })

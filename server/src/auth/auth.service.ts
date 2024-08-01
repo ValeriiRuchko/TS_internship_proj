@@ -1,11 +1,10 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { genSalt, hash } from 'bcrypt';
 import { LoginUserDto } from './dto/login.dto';
-import { User } from 'src/users/entities/users.entity';
-import { ReqWithToken } from 'src/types_&_interfaces/request.interface';
+import { User } from '../users/entities/users.entity';
 
 @Injectable()
 export class AuthService {
@@ -14,7 +13,7 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService,
-  ) { }
+  ) {}
 
   async signUp(registerUserDto: RegisterUserDto) {
     let existingUser: User | undefined;

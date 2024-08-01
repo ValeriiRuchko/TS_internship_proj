@@ -1,4 +1,4 @@
-// @/src/seed.ts
+
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { runSeeders } from 'typeorm-extension';

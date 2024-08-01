@@ -1,6 +1,6 @@
-// @/src/db/seeding/factories/notification.factory.ts
+
 import { setSeederFactory } from 'typeorm-extension';
-import { NotificationTime } from 'src/notification_times/entities/notification_time.entity';
+import { NotificationTime } from '../../notification_times/entities/notification_time.entity';
 
 export const NotificationTimeFactory = setSeederFactory(
   NotificationTime,

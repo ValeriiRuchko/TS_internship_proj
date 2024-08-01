@@ -13,15 +13,13 @@ import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { CategoryGroup } from 'src/category_groups/entities/category_group.entity';
-import { ReqWithToken } from 'src/types_&_interfaces/request.interface';
-// import { Roles } from 'src/auth/auth.decorator';
-// import { Role } from 'src/auth/enums/role.enum';
+import { CategoryGroup } from '../category_groups/entities/category_group.entity';
+import { ReqWithToken } from '../types_&_interfaces/request.interface';
 
 @Controller('categories')
 @UseGuards(AuthGuard('jwt'))
 export class CategoriesController {
-  constructor(private readonly categoriesService: CategoriesService) {}
+  constructor(private readonly categoriesService: CategoriesService) { }
 
   @Post()
   // @Roles(Role.Premium)

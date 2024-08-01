@@ -1,7 +1,7 @@
-import { Category } from 'src/categories/entities/category.entity';
-import { Image } from 'src/images/entities/image.entity';
-import { Notification } from 'src/notifications/entities/notifications.entity';
-import { User } from 'src/users/entities/users.entity';
+import { Category } from '../../categories/entities/category.entity';
+import { Image } from '../../images/entities/image.entity';
+import { Notification } from '../../notifications/entities/notifications.entity';
+import { User } from '../../users/entities/users.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,

@@ -1,5 +1,5 @@
-import { CategoryGroup } from 'src/category_groups/entities/category_group.entity';
-import { Med } from 'src/meds/entities/meds.entity';
+import { CategoryGroup } from '../../category_groups/entities/category_group.entity';
+import { Med } from '../../meds/entities/meds.entity';
 import {
   Column,
   Entity,

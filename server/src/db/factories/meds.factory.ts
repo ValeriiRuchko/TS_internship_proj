@@ -1,6 +1,6 @@
-// @/src/db/seeding/factories/med.factory.ts
+
 import { setSeederFactory } from 'typeorm-extension';
-import { Med } from 'src/meds/entities/meds.entity';
+import { Med } from '../../meds/entities/meds.entity';
 
 export const MedsFactory = setSeederFactory(Med, (faker) => {
   const med = new Med();

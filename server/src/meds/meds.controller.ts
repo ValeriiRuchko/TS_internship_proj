@@ -19,14 +19,14 @@ import { CreateMedDto } from './dto/create-med.dto';
 import { UpdateMedDto } from './dto/update-med.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { FilteredMedDto } from './dto/find-filtered.dto';
-import { ReqWithToken } from 'src/types_&_interfaces/request.interface';
+import { ReqWithToken } from '../types_&_interfaces/request.interface';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { FileRejectedErrorFilter } from './helpers/meds.filter';
 
 @Controller('meds')
 @UseGuards(AuthGuard('jwt'))
 export class MedsController {
-  constructor(private readonly medsService: MedsService) {}
+  constructor(private readonly medsService: MedsService) { }
 
   @Post(':id/images')
   @UseInterceptors(FilesInterceptor('files'))

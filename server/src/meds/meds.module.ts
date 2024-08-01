@@ -3,13 +3,13 @@ import { MedsService } from './meds.service';
 import { MedsController } from './meds.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Med } from './entities/meds.entity';
-import { UsersModule } from 'src/users/users.module';
+import { UsersModule } from '../users/users.module';
 import { MulterModule } from '@nestjs/platform-express';
 import * as multer from 'multer';
 import * as path from 'path';
-import { ImagesModule } from 'src/images/images.module';
-import { NotificationsModule } from 'src/notifications/notifications.module';
-import { CategoriesModule } from 'src/categories/categories.module';
+import { ImagesModule } from '../images/images.module';
+import { NotificationsModule } from '../notifications/notifications.module';
+import { CategoriesModule } from '../categories/categories.module';
 
 @Module({
   imports: [
@@ -50,4 +50,4 @@ import { CategoriesModule } from 'src/categories/categories.module';
   controllers: [MedsController],
   providers: [MedsService],
 })
-export class MedsModule {}
+export class MedsModule { }

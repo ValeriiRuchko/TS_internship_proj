@@ -10,12 +10,12 @@ import {
 import { AuthService } from './auth.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { LoginUserDto } from './dto/login.dto';
-import { ReqWithToken } from 'src/types_&_interfaces/request.interface';
+import { ReqWithToken } from '../types_&_interfaces/request.interface';
 import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) { }
 
   @HttpCode(HttpStatus.OK)
   @Post('sign-up')
