@@ -29,7 +29,10 @@ export class CategoriesController {
 
   @Get()
   findAll(@Body() categoryGroup: CategoryGroup, @Req() req: ReqWithToken) {
-    return this.categoriesService.findAll(categoryGroup, req.user.sub);
+    return this.categoriesService.findAllInCategoryGroup(
+      categoryGroup,
+      req.user.sub,
+    );
   }
 
   @Get(':id')
