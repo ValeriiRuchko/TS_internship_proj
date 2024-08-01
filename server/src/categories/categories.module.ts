@@ -19,6 +19,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     CategoriesService,
     // { provide: APP_GUARD, useClass: PremiumGuard },
   ],
-  exports: [TypeOrmModule, CategoriesService],
+  exports: [CategoriesService],
 })
-export class CategoriesModule { }
+export class CategoriesModule {}

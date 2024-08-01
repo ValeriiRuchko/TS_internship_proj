@@ -18,7 +18,7 @@ import { ReqWithToken } from '../types_&_interfaces/request.interface';
 @Controller('notifications')
 @UseGuards(AuthGuard('jwt'))
 export class NotificationsController {
-  constructor(private readonly notificationsService: NotificationsService) { }
+  constructor(private readonly notificationsService: NotificationsService) {}
 
   @Post()
   create(
@@ -33,7 +33,7 @@ export class NotificationsController {
 
   @Get(':med_id')
   findAllForMed(@Param('med_id') med_id: string) {
-    return this.notificationsService.findAllForMed(med_id);
+    return this.notificationsService.findNotificationForMed(med_id);
   }
 
   @Get()

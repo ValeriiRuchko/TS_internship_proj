@@ -50,4 +50,4 @@ import { CategoriesModule } from '../categories/categories.module';
   controllers: [MedsController],
   providers: [MedsService],
 })
-export class MedsModule { }
+export class MedsModule {}
