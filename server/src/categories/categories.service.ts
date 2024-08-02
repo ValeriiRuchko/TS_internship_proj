@@ -18,7 +18,7 @@ export class CategoriesService {
     // private userService: UsersService,
   ) {}
 
-  async create(createCategoryDto: CreateCategoryDto): Promise<void> {
+  async create(createCategoryDto: CreateCategoryDto): Promise<Category> {
     const categoryGroup = await this.categoryGroupsService.findOne(
       createCategoryDto.categoryGroup.id,
     );
@@ -27,6 +27,7 @@ export class CategoriesService {
       categoryGroup,
     });
     this.logger.debug('Category was created', res);
+    return res;
   }
 
   async findAllInCategoryGroup(
