@@ -7,31 +7,31 @@ import { CategoryGroup } from 'src/category_groups/entities/category_group.entit
 import { CategoryGroupsService } from 'src/category_groups/category_groups.service';
 import { User } from 'src/users/entities/users.entity';
 
-const categoryGroup = new CategoryGroup();
-categoryGroup.name = 'body-parts';
-categoryGroup.id = '4';
-
-const user = new User();
-user.id = '5';
-
-categoryGroup.user = user;
-
-const testCategoryOne = new Category();
-testCategoryOne.id = '1';
-testCategoryOne.name = 'vitamins';
-testCategoryOne.categoryGroup = categoryGroup;
-
-const testCategoryTwo = new Category();
-testCategoryTwo.id = '2';
-testCategoryTwo.name = 'painkillers';
-testCategoryTwo.categoryGroup = categoryGroup;
-
-const categoriesArray = [testCategoryOne, testCategoryTwo];
-
 describe('CategoriesService', () => {
   let service: CategoriesService;
   let repo: jest.Mocked<Repository<Category>>;
   let categGroupRepo: jest.Mocked<Repository<CategoryGroup>>;
+
+  const categoryGroup = new CategoryGroup();
+  categoryGroup.name = 'body-parts';
+  categoryGroup.id = '4';
+
+  const user = new User();
+  user.id = '5';
+
+  categoryGroup.user = user;
+
+  const testCategoryOne = new Category();
+  testCategoryOne.id = '1';
+  testCategoryOne.name = 'vitamins';
+  testCategoryOne.categoryGroup = categoryGroup;
+
+  const testCategoryTwo = new Category();
+  testCategoryTwo.id = '2';
+  testCategoryTwo.name = 'painkillers';
+  testCategoryTwo.categoryGroup = categoryGroup;
+
+  const categoriesArray = [testCategoryOne, testCategoryTwo];
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({

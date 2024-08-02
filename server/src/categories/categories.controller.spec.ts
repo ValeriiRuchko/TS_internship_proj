@@ -61,10 +61,10 @@ describe('CategoriesController', () => {
               .mockImplementation((category: CreateCategoryDto) =>
                 Promise.resolve({ id: '1', ...category }),
               ),
-            updateOne: jest
+            update: jest
               .fn()
-              .mockImplementation((category: UpdateCategoryDto) =>
-                Promise.resolve({ id: '1', ...category }),
+              .mockImplementation((id, category: UpdateCategoryDto) =>
+                Promise.resolve({ id, ...category }),
               ),
             remove: jest.fn().mockResolvedValue({ deleted: true }),
           },
@@ -91,7 +91,7 @@ describe('CategoriesController', () => {
     });
   });
 
-  describe('create category controller', () => {
+  describe('create category with specified params', () => {
     it('should return created category', async () => {
       const category = await controller.create({
         name: 'vitamins',
@@ -105,6 +105,27 @@ describe('CategoriesController', () => {
         name: testCategoryOne.name,
         categoryGroup: testCategoryOne.categoryGroup,
       });
+    });
+  });
+
+  describe('findOne category by id', () => {
+    it('should return category with the same id', async () => {
+      const category = await controller.findOne('2');
+      const serviceSpy = jest.spyOn(service, 'findOne');
+
+      expect(category).toEqual({ ...testCategoryOne, id: '2' });
+      expect(serviceSpy).toHaveBeenCalledTimes(1);
+      expect(serviceSpy).toHaveBeenCalledWith('2');
+    });
+  });
+
+  describe('update category by id', () => {
+    it('should be called 1 time', async () => {
+      await controller.update('1', { name: 'Some name' });
+      const serviceSpy = jest.spyOn(service, 'update');
+
+      expect(serviceSpy).toHaveBeenCalledTimes(1);
+      expect(serviceSpy).toHaveBeenCalledWith('1', { name: 'Some name' });
     });
   });
 });
