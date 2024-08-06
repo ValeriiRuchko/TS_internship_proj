@@ -1,16 +1,27 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
-import { observer } from "mobx-react-lite";
 import { useStore } from "../models/RootStore";
+import { observer } from "mobx-react-lite";
+import { ChangeEventHandler, FormEventHandler, useRef } from "react";
 import { Instance } from "mobx-state-tree";
 import { UserModel } from "../models/UserModel";
-import { ChangeEventHandler, FormEventHandler, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+// import { onSnapshot } from "mobx-state-tree";
 
-type formData = Pick<Instance<typeof UserModel>, "email" | "password">;
+// NOTE: for our store to be reactive (change of values in store makes rerender) we need to
+// wrap necessary component as "observer" from "mobx-react-lite"
+//
+type formData = Pick<
+  Instance<typeof UserModel>,
+  "name" | "surname" | "email" | "password"
+>;
 
-export const MainPage = observer(() => {
+export const SignUpPage = observer(() => {
   const rootStore = useStore();
+  const navigate = useNavigate();
+
   const formDataRef = useRef<formData>({
+    name: "",
+    surname: "",
     email: "",
     password: "",
   });
@@ -24,27 +35,16 @@ export const MainPage = observer(() => {
     console.log(formDataRef.current);
   };
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = (event) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
+    const user = UserModel.create(formDataRef.current);
     try {
-      const user = UserModel.create({
-        email: formDataRef.current.email,
-        password: formDataRef.current.password,
-      });
-
-      user
-        .signIn()
-        .then((res) => {
-          return res?.json();
-        })
-        .then((data) => {
-          localStorage.setItem("token", data.access_token);
-        });
-
+      await user.signUp();
       rootStore.addUser(user);
     } catch (err) {
-      console.log("Couldn't login user", err);
+      console.log("Couldn't create new user", err);
     }
+    navigate("/");
   };
 
   return (
@@ -68,20 +68,41 @@ export const MainPage = observer(() => {
           }}
         >
           <Typography variant="h2" textAlign="center">
-            Welcome!
+            Sign-up
           </Typography>
           <form
-            id="sign-in-form"
+            id="sign-up-form"
             onSubmit={handleSubmit}
             style={{
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
+              padding: "4% 0",
               rowGap: "2rem",
               width: "inherit",
             }}
           >
+            <TextField
+              id="name"
+              label="Name"
+              variant="standard"
+              required
+              onChange={handleInputChange}
+              sx={{
+                width: "inherit",
+              }}
+            />
+            <TextField
+              id="surname"
+              label="Surname"
+              variant="standard"
+              required
+              onChange={handleInputChange}
+              sx={{
+                width: "inherit",
+              }}
+            />
             <TextField
               id="email"
               label="Email"
@@ -114,26 +135,22 @@ export const MainPage = observer(() => {
             }}
           >
             <Button
-              id="sign-in-submit"
+              id="sign-up-submit"
               type="submit"
-              form="sign-in-form"
+              form="sign-up-form"
+              sx={{ width: "inherit" }}
               variant="contained"
-              sx={{
-                width: "inherit",
-              }}
-            >
-              Login
-            </Button>
-            <Button
-              id="sign-up-redirect"
-              component={Link}
-              to="/sign-up"
-              variant="outlined"
-              sx={{
-                width: "inherit",
-              }}
             >
               Register
+            </Button>
+
+            <Button
+              component={Link}
+              to="/"
+              sx={{ width: "inherit" }}
+              variant="outlined"
+            >
+              Go back
             </Button>
           </Box>
         </Box>
