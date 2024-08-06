@@ -42,8 +42,13 @@ export class AuthService {
       password: hashedPass,
       salt,
     };
-    this.usersService.create(newUser);
-    return newUser;
+    const user = await this.usersService.create(newUser);
+    return {
+      id: user.id,
+      name: user.name,
+      surname: user.surname,
+      email: user.email,
+    };
   }
 
   async signIn(loginDto: LoginUserDto) {

@@ -9,7 +9,9 @@ import { join } from 'path';
 async function bootstrap() {
   // need to do smth with cors later on
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    cors: false,
+    cors: {
+      origin: '*',
+    },
     logger: ['warn', 'error', 'fatal', 'debug'],
   });
 
