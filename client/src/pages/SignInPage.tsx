@@ -3,45 +3,74 @@ import { observer } from "mobx-react-lite";
 import { useStore } from "../models/RootStore";
 import { Instance } from "mobx-state-tree";
 import { UserModel } from "../models/UserModel";
-import { ChangeEventHandler, FormEventHandler, useRef } from "react";
-import { Link } from "react-router-dom";
+import { ChangeEventHandler, FormEventHandler, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ErrorMsg } from "../types/commonTypes";
 
 type formData = Pick<Instance<typeof UserModel>, "email" | "password">;
 
-export const MainPage = observer(() => {
+export const SignInPage = observer(() => {
   const rootStore = useStore();
-  const formDataRef = useRef<formData>({
+  const navigate = useNavigate();
+  const [formDataState, setFormDataState] = useState<formData>({
     email: "",
     password: "",
   });
 
+  const [inputEmailError, setInputEmailError] = useState(false);
+  const [inputEmailHelperText, setInputEmailHelperText] = useState("");
+
+  const [inputPasswordError, setInputPasswordError] = useState(false);
+  const [inputPassHelperText, setInputPassHelperText] = useState("");
+
   const handleInputChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     const val = event.currentTarget.value;
-    formDataRef.current = {
-      ...formDataRef.current,
+    setFormDataState({
+      ...formDataState,
       [`${event.currentTarget.id}`]: val,
-    };
-    console.log(formDataRef.current);
+    });
+    console.log(formDataState);
   };
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = (event) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
     try {
-      const user = UserModel.create({
-        email: formDataRef.current.email,
-        password: formDataRef.current.password,
+      let user = UserModel.create({
+        email: formDataState.email,
+        password: formDataState.password,
       });
 
-      user
-        .signIn()
-        .then((res) => {
-          return res?.json();
-        })
-        .then((data) => {
-          localStorage.setItem("token", data.access_token);
-        });
+      const res = await user.signIn();
+      if (user.state === "error") {
+        const data = await (res?.json() as Promise<ErrorMsg>);
+        if (res?.status === 404) {
+          setInputEmailError(true);
+          setInputEmailHelperText(data.message);
+        } else {
+          setInputPasswordError(true);
+          setInputPassHelperText(data.message);
+        }
 
-      rootStore.addUser(user);
+        setFormDataState({ email: "", password: "" });
+        return;
+      } else if (user.state === "done") {
+        const data = await (res?.json() as Promise<{
+          access_token: string;
+          id: string;
+          name: string;
+          surname: string;
+        }>);
+        user = UserModel.create({
+          id: data.id,
+          name: data.name,
+          surname: data.surname,
+          email: formDataState.email,
+          password: "",
+        });
+        localStorage.setItem("token", data.access_token);
+        rootStore.addUser(user);
+        navigate("app");
+      }
     } catch (err) {
       console.log("Couldn't login user", err);
     }
@@ -63,7 +92,7 @@ export const MainPage = observer(() => {
             display: "flex",
             flexDirection: "column",
             alignItems: "inherit",
-            rowGap: "2rem",
+            rowGap: "1rem",
             width: "15rem",
           }}
         >
@@ -73,12 +102,21 @@ export const MainPage = observer(() => {
           <form
             id="sign-in-form"
             onSubmit={handleSubmit}
+            onInput={() => {
+              if (inputEmailError || inputPasswordError) {
+                setInputEmailError(false);
+                setInputEmailHelperText("");
+
+                setInputPasswordError(false);
+                setInputPassHelperText("");
+              }
+            }}
             style={{
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
-              rowGap: "2rem",
+              rowGap: "1rem",
               width: "inherit",
             }}
           >
@@ -92,6 +130,9 @@ export const MainPage = observer(() => {
               sx={{
                 width: "inherit",
               }}
+              value={formDataState.email}
+              error={inputEmailError}
+              helperText={inputEmailHelperText}
             />
             <TextField
               id="password"
@@ -103,6 +144,9 @@ export const MainPage = observer(() => {
               sx={{
                 width: "inherit",
               }}
+              value={formDataState.password}
+              error={inputPasswordError}
+              helperText={inputPassHelperText}
             />
           </form>
           <Box

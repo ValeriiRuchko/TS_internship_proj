@@ -8,6 +8,7 @@ import "@fontsource/roboto/700.css";
 import "./styles/index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { SignUpPage } from "./pages/SignUpPage.tsx";
+import { MainAppPage } from "./pages/MainAppPage.tsx";
 // import { SignInPage } from "./pages/SignInPage.tsx";
 
 const router = createBrowserRouter([
@@ -18,6 +19,10 @@ const router = createBrowserRouter([
       {
         path: "sign-up",
         element: <SignUpPage />,
+      },
+      {
+        path: "app",
+        element: <MainAppPage />,
       },
     ],
   },

@@ -4,7 +4,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { Box } from "@mui/material";
 import { Outlet, useLocation } from "react-router-dom";
-import { MainPage } from "./pages/MainPage";
+import { SignInPage } from "./pages/SignInPage";
 
 const darkTheme = createTheme({
   palette: {
@@ -20,7 +20,7 @@ function App() {
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
       <Box className="App">
-        {currLocation.pathname === "/" ? <MainPage /> : <Outlet />}
+        {currLocation.pathname === "/" ? <SignInPage /> : <Outlet />}
       </Box>
     </ThemeProvider>
   );

@@ -13,7 +13,7 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private usersService: UsersService,
-  ) {}
+  ) { }
 
   async signUp(registerUserDto: RegisterUserDto) {
     let existingUser: User | undefined;
@@ -54,12 +54,6 @@ export class AuthService {
   async signIn(loginDto: LoginUserDto) {
     const { email, password } = loginDto;
     const existingUser = await this.usersService.findOneByEmail(email);
-    if (!existingUser) {
-      throw new HttpException(
-        "User with such email doesn't exists",
-        HttpStatus.NOT_FOUND,
-      );
-    }
 
     const hashedPass = await hash(password, existingUser.salt);
     if (hashedPass !== existingUser.password) {
@@ -73,6 +67,9 @@ export class AuthService {
 
     return {
       access_token: await this.jwtService.signAsync(payload),
+      id: existingUser.id,
+      name: existingUser.name,
+      surname: existingUser.surname,
     };
   }
 

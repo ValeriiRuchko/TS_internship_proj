@@ -11,7 +11,7 @@ export class UsersService {
 
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const user = await this.usersRepository.save(createUserDto);
@@ -36,7 +36,10 @@ export class UsersService {
   async findOneByEmail(email: string): Promise<User> {
     const user = await this.usersRepository.findOneBy({ email });
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        'User with such email was not found',
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     return user;

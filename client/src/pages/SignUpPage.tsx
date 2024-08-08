@@ -1,10 +1,11 @@
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { useStore } from "../models/RootStore";
 import { observer } from "mobx-react-lite";
-import { ChangeEventHandler, FormEventHandler, useRef } from "react";
+import { ChangeEventHandler, FormEventHandler, useState } from "react";
 import { Instance } from "mobx-state-tree";
 import { UserModel } from "../models/UserModel";
 import { Link, useNavigate } from "react-router-dom";
+import { ErrorMsg } from "../types/commonTypes";
 // import { onSnapshot } from "mobx-state-tree";
 
 // NOTE: for our store to be reactive (change of values in store makes rerender) we need to
@@ -19,32 +20,58 @@ export const SignUpPage = observer(() => {
   const rootStore = useStore();
   const navigate = useNavigate();
 
-  const formDataRef = useRef<formData>({
+  const [formDataState, setFormDataState] = useState<formData>({
     name: "",
     surname: "",
     email: "",
     password: "",
   });
 
+  const [inputEmailError, setInputEmailError] = useState(false);
+  const [inputHelperText, setInputHelperText] = useState("");
+
   const handleInputChange: ChangeEventHandler<HTMLInputElement> = (event) => {
     const val = event.currentTarget.value;
-    formDataRef.current = {
-      ...formDataRef.current,
+    setFormDataState({
+      ...formDataState,
       [`${event.currentTarget.id}`]: val,
-    };
-    console.log(formDataRef.current);
+    });
+    console.log(formDataState);
   };
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (event) => {
     event.preventDefault();
-    const user = UserModel.create(formDataRef.current);
+    let user = UserModel.create(formDataState);
     try {
-      await user.signUp();
-      rootStore.addUser(user);
+      const res = await user.signUp();
+      if (user.state === "error") {
+        const data = await (res?.json() as Promise<ErrorMsg>);
+        setInputEmailError(true);
+        setInputHelperText(data.message);
+
+        setFormDataState({
+          ...formDataState,
+          email: "",
+          password: "",
+        });
+
+        return;
+      } else if (user.state === "done") {
+        const data = (await res?.json()) as Promise<
+          Pick<Instance<typeof UserModel>, "id" | "name" | "surname" | "email">
+        >;
+        user = UserModel.create({
+          ...user,
+          ...data,
+          password: "",
+        });
+
+        rootStore.addUser(user);
+        navigate("/");
+      }
     } catch (err) {
-      console.log("Couldn't create new user", err);
+      console.log("Error occured", err);
     }
-    navigate("/");
   };
 
   return (
@@ -63,7 +90,7 @@ export const SignUpPage = observer(() => {
             display: "flex",
             flexDirection: "column",
             alignItems: "inherit",
-            rowGap: "2rem",
+            rowGap: "1rem",
             width: "15rem",
           }}
         >
@@ -73,35 +100,45 @@ export const SignUpPage = observer(() => {
           <form
             id="sign-up-form"
             onSubmit={handleSubmit}
+            onInput={() => {
+              if (inputEmailError) {
+                setInputEmailError(false);
+                setInputHelperText("");
+              }
+            }}
             style={{
               display: "flex",
               flexDirection: "column",
               justifyContent: "center",
               alignItems: "center",
               padding: "4% 0",
-              rowGap: "2rem",
+              rowGap: "1rem",
               width: "inherit",
             }}
           >
             <TextField
               id="name"
               label="Name"
-              variant="standard"
+              variant="filled"
               required
               onChange={handleInputChange}
               sx={{
                 width: "inherit",
               }}
+              value={formDataState.name}
+              helperText=" "
             />
             <TextField
               id="surname"
               label="Surname"
-              variant="standard"
+              variant="filled"
               required
               onChange={handleInputChange}
               sx={{
                 width: "inherit",
               }}
+              value={formDataState.surname}
+              helperText=" "
             />
             <TextField
               id="email"
@@ -113,6 +150,9 @@ export const SignUpPage = observer(() => {
               sx={{
                 width: "inherit",
               }}
+              value={formDataState.email}
+              error={inputEmailError}
+              helperText={inputHelperText}
             />
             <TextField
               id="password"
@@ -124,6 +164,8 @@ export const SignUpPage = observer(() => {
               sx={{
                 width: "inherit",
               }}
+              value={formDataState.password}
+              helperText=" "
             />
           </form>
           <Box

@@ -12,7 +12,7 @@ export const RootStore = t
       self.meds.push(med);
     },
 
-    addUser(user: Instance<typeof UserModel>) {
+    addUser: (user: Instance<typeof UserModel>) => {
       self.user = user;
     },
   }));

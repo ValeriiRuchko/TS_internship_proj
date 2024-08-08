@@ -1,6 +1,8 @@
 import { flow, t } from "mobx-state-tree";
 import fetcher from "../utils/fetchExtended";
 
+// TODO: add state to check and correctly navigate
+
 export const UserModel = t
   .model("UserModel", {
     id: t.maybe(t.string),
@@ -9,12 +11,14 @@ export const UserModel = t
     email: t.string,
     password: t.string,
     // userExists: false,
-    // state: t.enumeration("State", ["pending", "done", "error"]),
+    state: t.maybe(t.enumeration("State", ["pending", "done", "error"])),
   })
   .actions((self) => ({
-    signUp: flow(function* () {
+    signUp: flow(function*() {
+      self.state = "pending";
+
       try {
-        const user: { id: string } = yield fetcher("auth/sign-up", {
+        const res: Response = yield fetcher("auth/sign-up", {
           method: "POST",
           body: JSON.stringify({
             name: self.name,
@@ -23,28 +27,40 @@ export const UserModel = t
             password: self.password,
           }),
         });
-        self.id = user.id;
+
+        if (!res.ok) {
+          self.state = "error";
+        } else {
+          self.state = "done";
+        }
+
+        return res;
       } catch (err) {
+        self.state = "error";
         console.error("Error while creating new user", err);
       }
     }),
-    signIn: flow(function* () {
-      // yield in these generator functions is literally like await
-      // self.state = "pending";
+    signIn: flow(function*() {
+      self.state = "pending";
 
       try {
-        const token: Response = yield fetcher("auth/sign-in", {
+        const res: Response = yield fetcher("auth/sign-in", {
           method: "POST",
           body: JSON.stringify({
             email: self.email,
             password: self.password,
           }),
         });
-        return token;
 
-        // self.state = "done";
+        if (!res.ok) {
+          self.state = "error";
+        } else {
+          self.state = "done";
+        }
+
+        return res;
       } catch (err) {
-        // self.state = "error";
+        self.state = "error";
         console.log("Error while logging-in user", err);
       }
     }),

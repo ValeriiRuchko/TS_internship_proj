@@ -27,11 +27,11 @@ export default function fetcher(
 ) {
   const urlWithBase = new URL(url, baseURL);
 
-  for (const [key, val] of setHeaders(headers).entries()) {
-    console.log("Header:", key, " val: ", val);
-  }
+  // for (const [key, val] of setHeaders(headers).entries()) {
+  //   console.log("Header:", key, " val: ", val);
+  // }
 
-  console.log({ ...options });
+  // console.log({ ...options });
 
   return fetch(urlWithBase, {
     ...options,
