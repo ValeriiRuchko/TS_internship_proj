@@ -97,7 +97,7 @@ export const SignInPage = observer(() => {
           }}
         >
           <Typography variant="h2" textAlign="center">
-            Welcome!
+            Welcome at HealthKit.io!
           </Typography>
           <form
             id="sign-in-form"

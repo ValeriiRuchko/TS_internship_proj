@@ -9,6 +9,9 @@ import "./styles/index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { SignUpPage } from "./pages/SignUpPage.tsx";
 import { MainAppPage } from "./pages/MainAppPage.tsx";
+import { CreateAndUpdateMed } from "./pages/CreateAndUpdateMed.tsx";
+import { StatisticsPage } from "./pages/StatisticsPage.tsx";
+import { ProfilePage } from "./pages/ProfilePage.tsx";
 // import { SignInPage } from "./pages/SignInPage.tsx";
 
 const router = createBrowserRouter([
@@ -23,6 +26,20 @@ const router = createBrowserRouter([
       {
         path: "app",
         element: <MainAppPage />,
+        children: [
+          {
+            path: "create-and-change-med",
+            element: <CreateAndUpdateMed />,
+          },
+          {
+            path: "statistics",
+            element: <StatisticsPage />,
+          },
+          {
+            path: "profile",
+            element: <ProfilePage />,
+          },
+        ],
       },
     ],
   },
